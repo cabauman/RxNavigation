@@ -2,7 +2,8 @@
 using System;
 using System.Reactive;
 using System.Reactive.Linq;
-using XamFormsRxRouting.Interfaces;
+using XamFormsRxRouting.Common;
+using XamFormsRxRouting.Navigation.Interfaces;
 
 namespace XamFormsRxRouting.Modules
 {

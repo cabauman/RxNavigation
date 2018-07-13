@@ -1,16 +1,27 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<local:BaseContentPage xmlns="http://xamarin.com/schemas/2014/forms"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:local="clr-namespace:XamFormsRxRouting"
-             xmlns:module="clr-namespace:XamFormsRxRouting.Modules"
-             x:TypeArguments="module:IHomeViewModel"
-             x:Class="XamFormsRxRouting.Modules.HomePage">
+<local:BaseContentPage
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:XamFormsRxRouting.Common"
+    xmlns:module="clr-namespace:XamFormsRxRouting.Modules"
+    x:TypeArguments="module:IHomeViewModel"
+    x:Class="XamFormsRxRouting.Modules.HomePage">
 
-    <StackLayout>
+    <StackLayout
+        Padding="10"
+        Spacing="8">
         <!-- Place new controls here -->
-    	<Label Text="Welcome to Xamarin.Forms Rx Routing!" 
-           HorizontalOptions="Center"
-           VerticalOptions="CenterAndExpand" />
+    	<Label
+            Text="Welcome to Xamarin.Forms Rx Routing!" 
+            HorizontalOptions="Center" />
+        <Button
+            x:Name="NavigateButton"
+            Text="Navigate"
+            HorizontalOptions="Center"/>
+        <Button
+            x:Name="PopPagesButton"
+            Text="Pop Pages"
+            HorizontalOptions="Center"/>
     </StackLayout>
 
 </local:BaseContentPage>

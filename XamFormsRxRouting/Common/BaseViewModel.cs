@@ -1,8 +1,8 @@
 ﻿using ReactiveUI;
 using System;
-using XamFormsRxRouting.Interfaces;
+using XamFormsRxRouting.Navigation.Interfaces;
 
-namespace XamFormsRxRouting
+namespace XamFormsRxRouting.Common
 {
     public class BaseViewModel : ReactiveObject
     {

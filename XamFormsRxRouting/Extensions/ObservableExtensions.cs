@@ -2,7 +2,7 @@
 using System.Reactive;
 using System.Reactive.Linq;
 
-namespace XamFormsRxRouting
+namespace XamFormsRxRouting.Extensions
 {
     public static class ObservableExtensions
     {

@@ -1,6 +1,6 @@
 ﻿using ReactiveUI.XamForms;
 
-namespace XamFormsRxRouting
+namespace XamFormsRxRouting.Common
 {
     public class BaseContentPage<T> : ReactiveContentPage<T>
         where T : class

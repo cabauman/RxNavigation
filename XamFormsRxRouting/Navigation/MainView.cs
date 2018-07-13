@@ -6,9 +6,10 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using Xamarin.Forms;
-using XamFormsRxRouting.Interfaces;
+using XamFormsRxRouting.Extensions;
+using XamFormsRxRouting.Navigation.Interfaces;
 
-namespace XamFormsRxRouting
+namespace XamFormsRxRouting.Navigation
 {
     public sealed class MainView : NavigationPage, IView
     {

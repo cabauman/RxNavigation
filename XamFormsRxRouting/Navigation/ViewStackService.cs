@@ -5,9 +5,9 @@ using System.Collections.Immutable;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using XamFormsRxRouting.Interfaces;
+using XamFormsRxRouting.Navigation.Interfaces;
 
-namespace XamFormsRxRouting
+namespace XamFormsRxRouting.Navigation
 {
     public sealed class ViewStackService : IViewStackService, IEnableLogger
     {

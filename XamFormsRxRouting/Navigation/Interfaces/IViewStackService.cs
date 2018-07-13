@@ -2,7 +2,7 @@
 using System.Collections.Immutable;
 using System.Reactive;
 
-namespace XamFormsRxRouting.Interfaces
+namespace XamFormsRxRouting.Navigation.Interfaces
 {
     public interface IViewStackService
     {

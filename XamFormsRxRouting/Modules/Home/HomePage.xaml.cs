@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ReactiveUI;
+using System.Reactive.Disposables;
 using Xamarin.Forms;
+using XamFormsRxRouting.Common;
 
 namespace XamFormsRxRouting.Modules
 {
@@ -12,6 +10,17 @@ namespace XamFormsRxRouting.Modules
 		public HomePage()
 		{
 			InitializeComponent();
-		}
+
+            this.WhenActivated(
+                disposables =>
+                {
+                    this
+                        .BindCommand(ViewModel, vm => vm.Navigate, v => v.NavigateButton)
+                        .DisposeWith(disposables);
+                    this
+                        .BindCommand(ViewModel, vm => vm.PopPages, v => v.PopPagesButton)
+                        .DisposeWith(disposables);
+                });
+        }
 	}
 }

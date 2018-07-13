@@ -3,8 +3,9 @@ using Splat;
 using System;
 using System.Reactive.Linq;
 using Xamarin.Forms;
-using XamFormsRxRouting.Interfaces;
+using XamFormsRxRouting.Navigation.Interfaces;
 using XamFormsRxRouting.Modules;
+using XamFormsRxRouting.Navigation;
 
 namespace XamFormsRxRouting
 {

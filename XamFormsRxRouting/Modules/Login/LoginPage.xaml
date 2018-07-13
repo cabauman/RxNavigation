@@ -1,17 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<local:BaseContentPage xmlns="http://xamarin.com/schemas/2014/forms"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:local="clr-namespace:XamFormsRxRouting"
-             xmlns:module="clr-namespace:XamFormsRxRouting.Modules"
-             x:TypeArguments="module:ILoginViewModel"
-             x:Class="XamFormsRxRouting.Modules.LoginPage">
+<local:BaseContentPage
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:XamFormsRxRouting.Common"
+    xmlns:module="clr-namespace:XamFormsRxRouting.Modules"
+    x:TypeArguments="module:ILoginViewModel"
+    x:Class="XamFormsRxRouting.Modules.LoginPage">
 
     <StackLayout
         Padding="10"
         Spacing="8">
         <!-- Place new controls here -->
-    	<Label Text="Welcome to Xamarin.Forms Rx Routing!" 
-           HorizontalOptions="Center" />
+    	<Label
+            Text="Welcome to Xamarin.Forms Rx Routing!" 
+            HorizontalOptions="Center" />
         <Entry
             x:Name="EmailEntry"
             Placeholder="Email"

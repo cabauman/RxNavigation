@@ -1,5 +1,5 @@
 ﻿
-namespace XamFormsRxRouting.Interfaces
+namespace XamFormsRxRouting.Navigation.Interfaces
 {
     public interface IModalViewModel
     {
