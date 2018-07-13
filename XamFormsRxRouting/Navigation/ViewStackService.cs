@@ -42,6 +42,8 @@ namespace XamFormsRxRouting.Navigation
 
         public IView View => this.view;
 
+        public int PageCount => this.pageStack.Value.Count;
+
         public IObservable<IImmutableList<IModalViewModel>> ModalStack => this.modalStack;
 
         public IObservable<IImmutableList<IPageViewModel>> PageStack => this.pageStack;

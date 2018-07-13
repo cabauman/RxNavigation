@@ -8,6 +8,8 @@ namespace XamFormsRxRouting.Navigation.Interfaces
     {
         IView View { get; }
 
+        int PageCount { get; }
+
         IObservable<IImmutableList<IPageViewModel>> PageStack { get; }
 
         IObservable<IImmutableList<IModalViewModel>> ModalStack { get; }
