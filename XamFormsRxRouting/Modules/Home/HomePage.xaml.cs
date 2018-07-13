@@ -18,6 +18,9 @@ namespace XamFormsRxRouting.Modules
                         .BindCommand(ViewModel, vm => vm.Navigate, v => v.NavigateButton)
                         .DisposeWith(disposables);
                     this
+                        .Bind(ViewModel, vm => vm.PopCount, v => v.PopCountEntry.Text)
+                        .DisposeWith(disposables);
+                    this
                         .BindCommand(ViewModel, vm => vm.PopPages, v => v.PopPagesButton)
                         .DisposeWith(disposables);
                 });

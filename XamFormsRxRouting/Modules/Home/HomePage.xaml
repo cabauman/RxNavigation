@@ -18,10 +18,22 @@
             x:Name="NavigateButton"
             Text="Navigate"
             HorizontalOptions="Center"/>
-        <Button
-            x:Name="PopPagesButton"
-            Text="Pop Pages"
-            HorizontalOptions="Center"/>
+        
+        <StackLayout
+            Spacing="8"
+            Orientation="Horizontal">
+            <Switch
+                
+            <Entry
+                x:Name="PopCountEntry"
+                Placeholder="# of pages to pop"
+                Keyboard="Numeric"
+                HorizontalOptions="FillAndExpand"/>
+            <Button
+                x:Name="PopPagesButton"
+                Text="Pop Pages"/>
+        </StackLayout>
+
     </StackLayout>
 
 </local:BaseContentPage>
