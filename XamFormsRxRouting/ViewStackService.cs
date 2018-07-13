@@ -61,10 +61,15 @@ namespace XamFormsRxRouting
                     });
         }
 
-        public IObservable<Unit> PopPage(bool animate = true) =>
-            this
-                .view
-                .PopPage(animate);
+        public IObservable<Unit> PopPages(int count = 1, bool animateLastPage = true)
+        {
+            Ensure.ArgumentCondition(count > 0, "Number of pages should be greater than 0", nameof(count));
+
+            return Observable
+                .Range(1, count)
+                .SelectMany(x => view.PopPage(x == count && animateLastPage))
+                .Skip(count - 1);
+        }
 
         public IObservable<Unit> PushModal(IModalViewModel modal, string contract = null)
         {
