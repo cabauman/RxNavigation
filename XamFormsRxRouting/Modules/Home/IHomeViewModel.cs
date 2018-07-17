@@ -8,8 +8,12 @@ namespace XamFormsRxRouting.Modules
     {
         int PopCount { get; set; }
 
+        int PageIndex { get; set; }
+
         ReactiveCommand Navigate { get; }
 
         ReactiveCommand<Unit, Unit> PopPages { get; }
+
+        ReactiveCommand<Unit, Unit> PopToNewPage { get; }
     }
 }
