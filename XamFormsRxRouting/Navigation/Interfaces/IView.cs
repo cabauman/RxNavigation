@@ -16,6 +16,13 @@ namespace XamFormsRxRouting.Navigation.Interfaces
         IObservable<Unit> PopPage(
             bool animate);
 
+        void InsertPage(
+            int index,
+            IPageViewModel page,
+            string contract);
+
+        void RemovePage(int index);
+
         IObservable<Unit> PushModal(
             IModalViewModel modalViewModel,
             string contract);

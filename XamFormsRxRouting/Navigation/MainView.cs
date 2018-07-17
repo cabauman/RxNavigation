@@ -134,6 +134,19 @@ namespace XamFormsRxRouting.Navigation
                 // XF completes the pop operation on a background thread :/
                 .ObserveOn(this.mainScheduler);
 
+        public void InsertPage(int index, IPageViewModel pageViewModel, string contract = null)
+        {
+            var page = this.LocatePageFor(pageViewModel, contract);
+            this.SetPageTitle(page, pageViewModel.Id);
+            this.Navigation.InsertPageBefore(page, Navigation.NavigationStack[index]);
+        }
+
+        public void RemovePage(int index)
+        {
+            var page = Navigation.NavigationStack[index];
+            Navigation.RemovePage(page);
+        }
+
         private Page LocatePageFor(object viewModel, string contract)
         {
             Ensure.ArgumentNotNull(viewModel, nameof(viewModel));

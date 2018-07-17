@@ -63,14 +63,53 @@ namespace XamFormsRxRouting.Navigation
                     });
         }
 
+        public IObservable<Unit> PopToPage(int index, bool animateLastPage = true)
+        {
+            var stack = this.pageStack.Value;
+
+            Ensure.ArgumentCondition(index >= 0 && index < stack.Count, "Index is out of range.", nameof(index));
+
+            int idxOfLastPage = stack.Count - 1;
+            int numPagesToPop = idxOfLastPage - index;
+
+            return PopPages(numPagesToPop, animateLastPage);
+        }
+
         public IObservable<Unit> PopPages(int count = 1, bool animateLastPage = true)
         {
-            Ensure.ArgumentCondition(count > 0, "Number of pages should be greater than 0", nameof(count));
+            Ensure.ArgumentCondition(count > 0 && count < PageCount, "Page pop count should be greater than 0 and less than the size of the stack.", nameof(count));
 
-            return Observable
-                .Range(1, count)
-                .SelectMany(x => view.PopPage(x == count && animateLastPage))
-                .Skip(count - 1);
+            var stack = this.pageStack.Value;
+
+            if(count > 1)
+            {
+                // Remove count - 1 pages (leaving the top page).
+                int idxOfSecondToLastPage = stack.Count - 2;
+                for(int i = idxOfSecondToLastPage; i >= stack.Count - count; --i)
+                {
+                    this.view.RemovePage(i);
+                }
+
+                stack = stack.RemoveRange(stack.Count - count, count - 1);
+                this.pageStack.OnNext(stack);
+            }
+
+            // Now remove the top page with optional animation.
+            return this
+                .view
+                .PopPage(animateLastPage);
+        }
+
+        public void InsertPage(int index, IPageViewModel page, string contract = null)
+        {
+            var stack = this.pageStack.Value;
+
+            Ensure.ArgumentNotNull(page, nameof(page));
+            Ensure.ArgumentCondition(index >= 0 && index < stack.Count, "Index is out of range.", nameof(index));
+
+            stack = stack.Insert(index, page);
+            this.pageStack.OnNext(stack);
+            this.view.InsertPage(index, page, contract);
         }
 
         public IObservable<Unit> PushModal(IModalViewModel modal, string contract = null)

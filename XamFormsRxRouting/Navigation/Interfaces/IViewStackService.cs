@@ -20,9 +20,18 @@ namespace XamFormsRxRouting.Navigation.Interfaces
             bool resetStack = false,
             bool animate = true);
 
+        IObservable<Unit> PopToPage(
+            int index,
+            bool animateLastPage = true);
+
         IObservable<Unit> PopPages(
             int count = 1,
             bool animateLastPage = true);
+
+        void InsertPage(
+            int index,
+            IPageViewModel page,
+            string contract = null);
 
         IObservable<Unit> PushModal(
             IModalViewModel modal,
