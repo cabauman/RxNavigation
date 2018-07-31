@@ -4,28 +4,45 @@ using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using XamFormsRxRouting.Common;
+using XamFormsRxRouting.Navigation;
 using XamFormsRxRouting.Navigation.Interfaces;
 
 namespace XamFormsRxRouting.Modules
 {
     public class HomeViewModel : BaseViewModel, IHomeViewModel, IPageViewModel
     {
-        private int _popCount;
-        private int _pageIndex;
+        private int? _popCount;
+        private int? _pageIndex;
         private ObservableAsPropertyHelper<int> _pageCount;
 
         public HomeViewModel(IViewStackService viewStackService)
             : base(viewStackService)
         {
-            Navigate = ReactiveCommand.CreateFromObservable(
+            PushPage = ReactiveCommand.CreateFromObservable(
                 () =>
                 {
                     return ViewStackService.PushPage(new HomeViewModel(ViewStackService));
                 });
 
+            PushModalWithNav = ReactiveCommand.CreateFromObservable(
+                () =>
+                {
+                    return ViewStackService.PushModal(new NavigationPageViewModel(new HomeViewModel(ViewStackService)));
+                });
+
+            PushModalWithoutNav = ReactiveCommand.CreateFromObservable(
+                () =>
+                {
+                    return ViewStackService.PushModal(new HomeViewModel(ViewStackService));
+                });
+
             _pageCount = ViewStackService
                 .PageStack
-                .Select(x => x.Count)
+                .Select(
+                    x =>
+                    {
+                        return x != null ? x.Count : 0;
+                    })
                 .ToProperty(this, vm => vm.PageCount);
 
             var canPop = this.WhenAnyValue(
@@ -37,7 +54,7 @@ namespace XamFormsRxRouting.Modules
                 () =>
                 {
                     return ViewStackService
-                        .PopPages(_popCount, true);
+                        .PopPages(_popCount ?? 0, true);
                 },
                 canPop);
 
@@ -49,8 +66,8 @@ namespace XamFormsRxRouting.Modules
                 () =>
                 {
                     return Observable
-                        .Start(() => ViewStackService.InsertPage(PageIndex, new LoginViewModel(ViewStackService)), RxApp.MainThreadScheduler)
-                        .Concat(ViewStackService.PopToPage(PageIndex));
+                        .Start(() => ViewStackService.InsertPage(PageIndex ?? 0, new LoginViewModel(ViewStackService)), RxApp.MainThreadScheduler)
+                        .Concat(ViewStackService.PopToPage(PageIndex ?? 0));
                 },
                 canPopToNewPage);
 
@@ -63,13 +80,13 @@ namespace XamFormsRxRouting.Modules
 
         public string Id => nameof(HomeViewModel);
 
-        public int PopCount
+        public int? PopCount
         {
             get => _popCount;
             set => this.RaiseAndSetIfChanged(ref _popCount, value);
         }
 
-        public int PageIndex
+        public int? PageIndex
         {
             get => _pageIndex;
             set => this.RaiseAndSetIfChanged(ref _pageIndex, value);
@@ -77,7 +94,11 @@ namespace XamFormsRxRouting.Modules
 
         public int PageCount => _pageCount.Value;
 
-        public ReactiveCommand Navigate { get; }
+        public ReactiveCommand PushPage { get; }
+
+        public ReactiveCommand PushModalWithNav { get; }
+
+        public ReactiveCommand PushModalWithoutNav { get; }
 
         public ReactiveCommand<Unit, Unit> PopPages { get; }
 

@@ -15,7 +15,13 @@ namespace XamFormsRxRouting.Modules
                 disposables =>
                 {
                     this
-                        .BindCommand(ViewModel, vm => vm.Navigate, v => v.NavigateButton)
+                        .BindCommand(ViewModel, vm => vm.PushPage, v => v.PushPageButton)
+                        .DisposeWith(disposables);
+                    this
+                        .BindCommand(ViewModel, vm => vm.PushModalWithNav, v => v.PushModalWithNavButton)
+                        .DisposeWith(disposables);
+                    this
+                        .BindCommand(ViewModel, vm => vm.PushModalWithoutNav, v => v.PushModalWithoutNavButton)
                         .DisposeWith(disposables);
                     this
                         .Bind(ViewModel, vm => vm.PopCount, v => v.PopCountEntry.Text)
@@ -31,5 +37,5 @@ namespace XamFormsRxRouting.Modules
                         .DisposeWith(disposables);
                 });
         }
-	}
+    }
 }

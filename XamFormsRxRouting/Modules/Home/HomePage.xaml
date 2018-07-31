@@ -11,18 +11,28 @@
         Padding="10"
         Spacing="8">
         <!-- Place new controls here -->
-    	<Label
-            Text="Welcome to Xamarin.Forms Rx Routing!"
+        <Label
+            Text="PUSH"
             HorizontalOptions="Center" />
-        
-        <Button
-            x:Name="NavigateButton"
-            Text="Navigate"
-            HorizontalOptions="Center"/>
 
         <StackLayout
             Spacing="8"
             Orientation="Horizontal">
+            <Button
+                x:Name="PushModalWithNavButton"
+                Text="Modal w/nav"/>
+            <Button
+                x:Name="PushModalWithoutNavButton"
+                Text="Modal w/o nav"/>
+        </StackLayout>
+
+        <StackLayout
+            Spacing="10"
+            Orientation="Horizontal">
+            <Button
+                x:Name="PushPageButton"
+                Text="Push Page"
+                Margin="0,0,8,0"/>
             <Entry
                 x:Name="PopCountEntry"
                 Placeholder="# of pages to pop"
@@ -37,6 +47,18 @@
             Text="Insert a page and pop to it."
             HorizontalOptions="Center"
             Margin="0,10,0,0"/>
+        <StackLayout
+            Spacing="8"
+            Orientation="Horizontal">
+            <Entry
+                x:Name="InsertPageIndexEntry"
+                Placeholder="Page index to pop to"
+                Keyboard="Numeric"
+                HorizontalOptions="FillAndExpand"/>
+            <Button
+                x:Name="InsertPageButton"
+                Text="Insert Page"/>
+        </StackLayout>
         <StackLayout
             Spacing="8"
             Orientation="Horizontal">
