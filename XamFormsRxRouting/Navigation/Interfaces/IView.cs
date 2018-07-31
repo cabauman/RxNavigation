@@ -24,7 +24,7 @@ namespace XamFormsRxRouting.Navigation.Interfaces
         void RemovePage(int index);
 
         IObservable<Unit> PushModal(
-            IModalViewModel modalViewModel,
+            IPageViewModel modalViewModel,
             string contract);
 
         IObservable<Unit> PopModal();

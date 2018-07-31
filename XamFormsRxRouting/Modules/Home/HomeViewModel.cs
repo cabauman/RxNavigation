@@ -1,6 +1,7 @@
 ﻿using ReactiveUI;
 using System;
 using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using XamFormsRxRouting.Common;
 using XamFormsRxRouting.Navigation.Interfaces;
@@ -11,6 +12,7 @@ namespace XamFormsRxRouting.Modules
     {
         private int _popCount;
         private int _pageIndex;
+        private ObservableAsPropertyHelper<int> _pageCount;
 
         public HomeViewModel(IViewStackService viewStackService)
             : base(viewStackService)
@@ -21,9 +23,15 @@ namespace XamFormsRxRouting.Modules
                     return ViewStackService.PushPage(new HomeViewModel(ViewStackService));
                 });
 
+            _pageCount = ViewStackService
+                .PageStack
+                .Select(x => x.Count)
+                .ToProperty(this, vm => vm.PageCount);
+
             var canPop = this.WhenAnyValue(
                 vm => vm.PopCount,
-                popCount => popCount > 0 && popCount < ViewStackService.PageCount);
+                vm => vm.PageCount,
+                (popCount, pageCount) => popCount > 0 && popCount < pageCount);
 
             PopPages = ReactiveCommand.CreateFromObservable(
                 () =>
@@ -35,7 +43,7 @@ namespace XamFormsRxRouting.Modules
 
             var canPopToNewPage = this.WhenAnyValue(
                 vm => vm.PageIndex,
-                pageIndex => pageIndex >= 0 && pageIndex < ViewStackService.PageCount);
+                pageIndex => pageIndex >= 0 && pageIndex < PageCount);
 
             PopToNewPage = ReactiveCommand.CreateFromObservable(
                 () =>
@@ -45,6 +53,12 @@ namespace XamFormsRxRouting.Modules
                         .Concat(ViewStackService.PopToPage(PageIndex));
                 },
                 canPopToNewPage);
+
+            this.WhenActivated(
+                disposables =>
+                {
+                    _pageCount.DisposeWith(disposables);
+                });
         }
 
         public string Id => nameof(HomeViewModel);
@@ -60,6 +74,8 @@ namespace XamFormsRxRouting.Modules
             get => _pageIndex;
             set => this.RaiseAndSetIfChanged(ref _pageIndex, value);
         }
+
+        public int PageCount => _pageCount.Value;
 
         public ReactiveCommand Navigate { get; }
 

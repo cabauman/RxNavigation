@@ -11,17 +11,24 @@ namespace XamFormsRxRouting.Navigation
 {
     public sealed class ViewStackService : IViewStackService, IEnableLogger
     {
-        private readonly BehaviorSubject<IImmutableList<IModalViewModel>> modalStack;
-        private readonly BehaviorSubject<IImmutableList<IPageViewModel>> pageStack;
         private readonly IView view;
+        private readonly INavigationPageViewModel defaultNavigationPage;
+        private readonly BehaviorSubject<IImmutableList<INavigationPageViewModel>> modalNavigationPages;
+        private readonly BehaviorSubject<IImmutableList<IPageViewModel>> modalNavigationPages2;
+        private readonly BehaviorSubject<IImmutableList<IPageViewModel>> currentPageStack;
 
         public ViewStackService(IView view)
         {
             Ensure.ArgumentNotNull(view, nameof(view));
 
-            this.modalStack = new BehaviorSubject<IImmutableList<IModalViewModel>>(ImmutableList<IModalViewModel>.Empty);
-            this.pageStack = new BehaviorSubject<IImmutableList<IPageViewModel>>(ImmutableList<IPageViewModel>.Empty);
+            this.defaultNavigationPage = new NavigationPageViewModel();
+            this.currentPageStack = new BehaviorSubject<IImmutableList<IPageViewModel>>(ImmutableList<IPageViewModel>.Empty);
+            this.modalNavigationPages = new BehaviorSubject<IImmutableList<INavigationPageViewModel>>(ImmutableList<INavigationPageViewModel>.Empty);
             this.view = view;
+
+            this.modalNavigationPages
+                    .Select(x => x.Count > 0 ? x[x.Count - 1].PageStack : this.defaultNavigationPage.PageStack)
+                    .Subscribe(x => this.currentPageStack.OnNext(x));
 
             this
                 .view
@@ -29,11 +36,11 @@ namespace XamFormsRxRouting.Navigation
                 .Do(
                     poppedPage =>
                     {
-                        var currentPageStack = this.pageStack.Value;
+                        var pageStack = this.currentPageStack.Value;
 
-                        if(currentPageStack.Count > 0 && poppedPage == currentPageStack[currentPageStack.Count - 1])
+                        if(pageStack.Count > 0 && poppedPage == pageStack[pageStack.Count - 1])
                         {
-                            var removedPage = PopStackAndTick(this.pageStack);
+                            var removedPage = PopStackAndTick(this.currentPageStack);
                             this.Log().Debug("Removed page '{0}' from stack.", removedPage.Id);
                         }
                     })
@@ -42,30 +49,38 @@ namespace XamFormsRxRouting.Navigation
 
         public IView View => this.view;
 
-        public int PageCount => this.pageStack.Value.Count;
+        public IObservable<IImmutableList<IPageViewModel>> PageStack => this.currentPageStack;
 
-        public IObservable<IImmutableList<IModalViewModel>> ModalStack => this.modalStack;
-
-        public IObservable<IImmutableList<IPageViewModel>> PageStack => this.pageStack;
+        public IObservable<IImmutableList<INavigationPageViewModel>> ModalStack => this.modalNavigationPages;
 
         public IObservable<Unit> PushPage(IPageViewModel page, string contract = null, bool resetStack = false, bool animate = true)
         {
-            Ensure.ArgumentNotNull(page, nameof(page));
-
             return this
                 .view
                 .PushPage(page, contract, resetStack, animate)
                 .Do(
                     _ =>
                     {
-                        AddToStackAndTick(this.pageStack, page, resetStack);
+                        AddToStackAndTick(this.currentPageStack, page, resetStack);
                         this.Log().Debug("Added page '{0}' (contract '{1}') to stack.", page.Id, contract);
                     });
         }
 
+        public void InsertPage(int index, IPageViewModel page, string contract = null)
+        {
+            var stack = this.currentPageStack.Value;
+
+            Ensure.ArgumentNotNull(page, nameof(page));
+            Ensure.ArgumentCondition(index >= 0 && index < stack.Count, "Index is out of range.", nameof(index));
+
+            stack = stack.Insert(index, page);
+            this.currentPageStack.OnNext(stack);
+            this.view.InsertPage(index, page, contract);
+        }
+
         public IObservable<Unit> PopToPage(int index, bool animateLastPage = true)
         {
-            var stack = this.pageStack.Value;
+            var stack = this.currentPageStack.Value;
 
             Ensure.ArgumentCondition(index >= 0 && index < stack.Count, "Index is out of range.", nameof(index));
 
@@ -77,9 +92,9 @@ namespace XamFormsRxRouting.Navigation
 
         public IObservable<Unit> PopPages(int count = 1, bool animateLastPage = true)
         {
-            Ensure.ArgumentCondition(count > 0 && count < PageCount, "Page pop count should be greater than 0 and less than the size of the stack.", nameof(count));
+            var stack = this.currentPageStack.Value;
 
-            var stack = this.pageStack.Value;
+            Ensure.ArgumentCondition(count > 0 && count < stack.Count, "Page pop count should be greater than 0 and less than the size of the stack.", nameof(count));
 
             if(count > 1)
             {
@@ -89,30 +104,21 @@ namespace XamFormsRxRouting.Navigation
                 {
                     this.view.RemovePage(i);
                 }
-
-                stack = stack.RemoveRange(stack.Count - count, count - 1);
-                this.pageStack.OnNext(stack);
             }
 
             // Now remove the top page with optional animation.
             return this
                 .view
-                .PopPage(animateLastPage);
+                .PopPage(animateLastPage)
+                .Do(
+                    _ =>
+                    {
+                        stack = stack.RemoveRange(stack.Count - count, count - 1);
+                        this.currentPageStack.OnNext(stack);
+                    });
         }
 
-        public void InsertPage(int index, IPageViewModel page, string contract = null)
-        {
-            var stack = this.pageStack.Value;
-
-            Ensure.ArgumentNotNull(page, nameof(page));
-            Ensure.ArgumentCondition(index >= 0 && index < stack.Count, "Index is out of range.", nameof(index));
-
-            stack = stack.Insert(index, page);
-            this.pageStack.OnNext(stack);
-            this.view.InsertPage(index, page, contract);
-        }
-
-        public IObservable<Unit> PushModal(IModalViewModel modal, string contract = null)
+        public IObservable<Unit> PushModal(IPageViewModel modal, string contract = null)
         {
             Ensure.ArgumentNotNull(modal, nameof(modal));
 
@@ -122,7 +128,9 @@ namespace XamFormsRxRouting.Navigation
                 .Do(
                     _ =>
                     {
-                        AddToStackAndTick(this.modalStack, modal, false);
+                        var navigationPage = new NavigationPageViewModel(modal);
+                        AddToStackAndTick(this.modalNavigationPages, navigationPage, false);
+                        //AddToStackAndTick(this.modalNavigationPages2, modal, false);
                         this.Log().Debug("Added modal '{0}' (contract '{1}') to stack.", modal.Id, contract);
                     });
         }
@@ -134,7 +142,7 @@ namespace XamFormsRxRouting.Navigation
                 .Do(
                     _ =>
                     {
-                        var removedModal = PopStackAndTick(this.modalStack);
+                        var removedModal = PopStackAndTick(this.modalNavigationPages);
                         this.Log().Debug("Removed modal '{0}' from stack.", removedModal.Id);
                     });
 

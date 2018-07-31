@@ -11,7 +11,7 @@ namespace XamFormsRxRouting
 {
     public sealed class AppBootstrapper
     {
-        private readonly NavigationPage _navigationPage;
+        private readonly Xamarin.Forms.NavigationPage _navigationPage;
 
         public AppBootstrapper()
         {
@@ -22,7 +22,7 @@ namespace XamFormsRxRouting
             RegisterViews();
 
             IView mainView = new MainView(RxApp.TaskpoolScheduler, RxApp.MainThreadScheduler, ViewLocator.Current);
-            _navigationPage = mainView as NavigationPage;
+            _navigationPage = mainView as Xamarin.Forms.NavigationPage;
             IViewStackService viewStackService = new ViewStackService(mainView);
             Locator.CurrentMutable.RegisterConstant(viewStackService, typeof(IViewStackService));
 

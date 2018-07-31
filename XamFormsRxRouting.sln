@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XamFormsRxRouting.iOS", "Xa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XamFormsRxRouting.UWP", "XamFormsRxRouting.UWP\XamFormsRxRouting.UWP.csproj", "{91D008B1-0980-4ABA-B789-F88AB1155D1A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XamFormsRxRouting", "XamFormsRxRouting\XamFormsRxRouting.csproj", "{02BE01DA-EFDD-4546-9C6C-2D49CE8F14F8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XamFormsRxRouting", "XamFormsRxRouting\XamFormsRxRouting.csproj", "{02BE01DA-EFDD-4546-9C6C-2D49CE8F14F8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
