@@ -10,7 +10,7 @@ namespace XamFormsRxRouting.Navigation.Interfaces
 
         IObservable<IImmutableList<IPageViewModel>> PageStack { get; }
 
-        IObservable<IImmutableList<INavigationPageViewModel>> ModalStack { get; }
+        IObservable<IImmutableList<IPageViewModel>> ModalStack { get; }
 
         IObservable<Unit> PushPage(
             IPageViewModel page,
@@ -33,6 +33,10 @@ namespace XamFormsRxRouting.Navigation.Interfaces
 
         IObservable<Unit> PushModal(
             IPageViewModel modal,
+            string contract = null);
+
+        IObservable<Unit> PushModal(
+            INavigationPageViewModel modal,
             string contract = null);
 
         IObservable<Unit> PopModal();

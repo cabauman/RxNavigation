@@ -3,11 +3,6 @@ using XamFormsRxRouting.Navigation.Interfaces;
 
 namespace XamFormsRxRouting.Navigation
 {
-    public interface INavigationPageViewModel : IPageViewModel
-    {
-        IImmutableList<IPageViewModel> PageStack { get; }
-    }
-
     public sealed class NavigationPageViewModel : INavigationPageViewModel
     {
         public NavigationPageViewModel()
@@ -20,8 +15,8 @@ namespace XamFormsRxRouting.Navigation
             this.PageStack = ImmutableList.Create(page);
         }
 
-        public IImmutableList<IPageViewModel> PageStack { get; set; }
+        public string Id => PageStack[0].Id;
 
-        public string Id => "";
+        public IImmutableList<IPageViewModel> PageStack { get; set; }
     }
 }
