@@ -50,9 +50,6 @@ namespace RxNavigation
                 .Select(x => x as IViewFor)
                 .Where(x => x != null)
                 .Select(x => x.ViewModel as IPageViewModel);
-
-            //this.navigationPages = new Stack<UINavigationController>();
-            //this.navigationPages.Push(this);
         }
 
         public IObservable<IPageViewModel> PagePopped => this.PagePopped;
