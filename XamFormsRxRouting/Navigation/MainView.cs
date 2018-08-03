@@ -1,6 +1,6 @@
-﻿using Genesis.Ensure;
-using ReactiveUI;
+﻿using ReactiveUI;
 using System;
+using System.Collections.Generic;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
@@ -11,44 +11,60 @@ using XamFormsRxRouting.Navigation.Interfaces;
 
 namespace XamFormsRxRouting.Navigation
 {
-    public sealed class MainView : NavigationPage, IView
+    public sealed class MainView : Xamarin.Forms.NavigationPage, IView
     {
         private readonly IScheduler backgroundScheduler;
         private readonly IScheduler mainScheduler;
         private readonly IViewLocator viewLocator;
         private readonly IObservable<IPageViewModel> pagePopped;
+        private readonly IObservable<Unit> modalPopped;
 
-        public MainView(
-            IScheduler backgroundScheduler,
-            IScheduler mainScheduler,
-            IViewLocator viewLocator)
+        private Stack<Xamarin.Forms.NavigationPage> navigationPages;
+
+        public MainView(IScheduler backgroundScheduler, IScheduler mainScheduler, IViewLocator viewLocator)
         {
-            Ensure.ArgumentNotNull(backgroundScheduler, nameof(backgroundScheduler));
-            Ensure.ArgumentNotNull(mainScheduler, nameof(mainScheduler));
-            Ensure.ArgumentNotNull(viewLocator, nameof(viewLocator));
+            this.backgroundScheduler = backgroundScheduler ?? RxApp.TaskpoolScheduler;
+            this.mainScheduler = mainScheduler ?? RxApp.MainThreadScheduler;
+            this.viewLocator = viewLocator ?? ViewLocator.Current;
 
-            this.backgroundScheduler = backgroundScheduler;
-            this.mainScheduler = mainScheduler;
-            this.viewLocator = viewLocator;
+            this.navigationPages = new Stack<Xamarin.Forms.NavigationPage>();
+            this.navigationPages.Push(this);
 
             this.pagePopped = Observable
                 .FromEventPattern<NavigationEventArgs>(x => this.Popped += x, x => this.Popped -= x)
                 .Select(ep => ep.EventArgs.Page.BindingContext as IPageViewModel)
                 .WhereNotNull();
+
+            this.modalPopped = Observable
+                .FromEventPattern<ModalPoppedEventArgs>(x => Application.Current.ModalPopped += x, x => Application.Current.ModalPopped -= x)
+                .Select(
+                    ep =>
+                    {
+                        //var page = ep.EventArgs.Modal.BindingContext as IPageViewModel;
+                        //return page;
+                        return Unit.Default;
+                    });
+                //.WhereNotNull();
         }
 
         public IObservable<IPageViewModel> PagePopped => this.pagePopped;
 
-        public IObservable<Unit> PushModal(IModalViewModel modalViewModel, string contract)
-        {
-            Ensure.ArgumentNotNull(modalViewModel, nameof(modalViewModel));
+        public IObservable<Unit> ModalPopped => this.modalPopped;
 
+        public IObservable<Unit> PushModal(IPageViewModel modalViewModel, string contract, bool withNavStack)
+        {
             return Observable
                 .Start(
                     () =>
                     {
                         var page = this.LocatePageFor(modalViewModel, contract);
                         this.SetPageTitle(page, modalViewModel.Id);
+                        if(withNavStack)
+                        {
+                            page = new Xamarin.Forms.NavigationPage(page);
+                            navigationPages.Push(page as NavigationPage);
+                        }
+                        
                         return page;
                     },
                     this.backgroundScheduler)
@@ -72,8 +88,6 @@ namespace XamFormsRxRouting.Navigation
 
         public IObservable<Unit> PushPage(IPageViewModel pageViewModel, string contract, bool resetStack, bool animate)
         {
-            Ensure.ArgumentNotNull(pageViewModel, nameof(pageViewModel));
-
             // If we don't have a root page yet, be sure we create one and assign one immediately because otherwise we'll get an exception.
             // Otherwise, create it off the main thread to improve responsiveness and perceived performance.
             var hasRoot = this.Navigation.NavigationStack.Count > 0;
@@ -98,6 +112,8 @@ namespace XamFormsRxRouting.Navigation
                             if(this.Navigation.NavigationStack.Count == 0)
                             {
                                 return this
+                                    .navigationPages
+                                    .Peek()
                                     .Navigation
                                     .PushAsync(page, animated: false)
                                     .ToObservable();
@@ -110,6 +126,8 @@ namespace XamFormsRxRouting.Navigation
                                     .InsertPageBefore(page, this.Navigation.NavigationStack[0]);
 
                                 return this
+                                    .navigationPages
+                                    .Peek()
                                     .Navigation
                                     .PopToRootAsync(animated: false)
                                     .ToObservable();
@@ -118,6 +136,8 @@ namespace XamFormsRxRouting.Navigation
                         else
                         {
                             return this
+                                .navigationPages
+                                .Peek()
                                 .Navigation
                                 .PushAsync(page, animate)
                                 .ToObservable();
@@ -127,6 +147,8 @@ namespace XamFormsRxRouting.Navigation
 
         public IObservable<Unit> PopPage(bool animate) =>
             this
+                .navigationPages
+                .Peek()
                 .Navigation
                 .PopAsync(animate)
                 .ToObservable()
@@ -138,36 +160,29 @@ namespace XamFormsRxRouting.Navigation
         {
             var page = this.LocatePageFor(pageViewModel, contract);
             this.SetPageTitle(page, pageViewModel.Id);
-            this.Navigation.InsertPageBefore(page, Navigation.NavigationStack[index]);
+            var currentNavigationPage = this.navigationPages.Peek();
+            currentNavigationPage.Navigation.InsertPageBefore(page, currentNavigationPage.Navigation.NavigationStack[index]);
         }
 
         public void RemovePage(int index)
         {
-            var page = Navigation.NavigationStack[index];
-            Navigation.RemovePage(page);
+            var page = this.navigationPages.Peek().Navigation.NavigationStack[index];
+            this.navigationPages.Peek().Navigation.RemovePage(page);
         }
 
         private Page LocatePageFor(object viewModel, string contract)
         {
-            Ensure.ArgumentNotNull(viewModel, nameof(viewModel));
+            var viewFor = viewLocator.ResolveView(viewModel, contract);
+            var page = viewFor as Page;
 
-            var view = viewLocator.ResolveView(viewModel, contract);
-            var viewFor = view as IViewFor;
-            var page = view as Page;
-
-            if(view == null)
+            if(viewFor == null)
             {
                 throw new InvalidOperationException($"No view could be located for type '{viewModel.GetType().FullName}', contract '{contract}'. Be sure Splat has an appropriate registration.");
             }
 
-            if(viewFor == null)
-            {
-                throw new InvalidOperationException($"Resolved view '{view.GetType().FullName}' for type '{viewModel.GetType().FullName}', contract '{contract}' does not implement IViewFor.");
-            }
-
             if(page == null)
             {
-                throw new InvalidOperationException($"Resolved view '{view.GetType().FullName}' for type '{viewModel.GetType().FullName}', contract '{contract}' is not a Page.");
+                throw new InvalidOperationException($"Resolved view '{viewFor.GetType().FullName}' for type '{viewModel.GetType().FullName}', contract '{contract}' is not a Page.");
             }
 
             viewFor.ViewModel = viewModel;

@@ -1,4 +1,4 @@
-﻿using Genesis.Ensure;
+﻿using ReactiveUI;
 using Splat;
 using System;
 using System.Collections.Immutable;
@@ -11,17 +11,52 @@ namespace XamFormsRxRouting.Navigation
 {
     public sealed class ViewStackService : IViewStackService, IEnableLogger
     {
-        private readonly BehaviorSubject<IImmutableList<IModalViewModel>> modalStack;
-        private readonly BehaviorSubject<IImmutableList<IPageViewModel>> pageStack;
         private readonly IView view;
+        private readonly BehaviorSubject<IImmutableList<IPageViewModel>> modalPageStack;
+        private readonly BehaviorSubject<IImmutableList<IPageViewModel>> currentPageStack;
+
+        private IImmutableList<IPageViewModel> defaultNavigationStack;
 
         public ViewStackService(IView view)
         {
-            Ensure.ArgumentNotNull(view, nameof(view));
+            if(view == null)
+            {
+                throw new NullReferenceException("The view can't be null.");
+            }
 
-            this.modalStack = new BehaviorSubject<IImmutableList<IModalViewModel>>(ImmutableList<IModalViewModel>.Empty);
-            this.pageStack = new BehaviorSubject<IImmutableList<IPageViewModel>>(ImmutableList<IPageViewModel>.Empty);
+            this.defaultNavigationStack = ImmutableList<IPageViewModel>.Empty;
+            this.currentPageStack = new BehaviorSubject<IImmutableList<IPageViewModel>>(ImmutableList<IPageViewModel>.Empty);
+            this.modalPageStack = new BehaviorSubject<IImmutableList<IPageViewModel>>(ImmutableList<IPageViewModel>.Empty);
             this.view = view;
+
+            this
+                .modalPageStack
+                    .Select(
+                        x =>
+                        {
+                            if(x.Count > 0)
+                            {
+                                if(x[x.Count - 1] is INavigationPageViewModel navigationPage)
+                                {
+                                    return navigationPage.PageStack;
+                                }
+                                else
+                                {
+                                    return null;
+                                }
+                            }
+                            else
+                            {
+                                return this.defaultNavigationStack;
+                            }
+                        })
+                    .Subscribe(x => this.currentPageStack.OnNext(x));
+
+            this
+                .currentPageStack
+                .Where(_ => this.modalPageStack.Value.Count == 0)
+                .Do(x => this.defaultNavigationStack = x)
+                .Subscribe();
 
             this
                 .view
@@ -29,28 +64,40 @@ namespace XamFormsRxRouting.Navigation
                 .Do(
                     poppedPage =>
                     {
-                        var currentPageStack = this.pageStack.Value;
+                        var pageStack = this.currentPageStack.Value;
 
-                        if(currentPageStack.Count > 0 && poppedPage == currentPageStack[currentPageStack.Count - 1])
+                        if(pageStack.Count > 0 && poppedPage == pageStack[pageStack.Count - 1])
                         {
-                            var removedPage = PopStackAndTick(this.pageStack);
+                            var removedPage = PopStackAndTick(this.currentPageStack);
                             this.Log().Debug("Removed page '{0}' from stack.", removedPage.Id);
                         }
+                    })
+                .Subscribe();
+
+            this
+                .view
+                .ModalPopped
+                .Do(
+                    _ =>
+                    {
+                        var removedPage = PopStackAndTick(this.modalPageStack);
+                        this.Log().Debug("Removed modal page '{0}' from stack.", removedPage.Id);
                     })
                 .Subscribe();
         }
 
         public IView View => this.view;
 
-        public int PageCount => this.pageStack.Value.Count;
+        public IObservable<IImmutableList<IPageViewModel>> PageStack => this.currentPageStack;
 
-        public IObservable<IImmutableList<IModalViewModel>> ModalStack => this.modalStack;
-
-        public IObservable<IImmutableList<IPageViewModel>> PageStack => this.pageStack;
+        public IObservable<IImmutableList<IPageViewModel>> ModalStack => this.modalPageStack;
 
         public IObservable<Unit> PushPage(IPageViewModel page, string contract = null, bool resetStack = false, bool animate = true)
         {
-            Ensure.ArgumentNotNull(page, nameof(page));
+            if(this.currentPageStack.Value == null)
+            {
+                throw new InvalidOperationException("Can't push a page onto a modal with no navigation stack.");
+            }
 
             return this
                 .view
@@ -58,16 +105,48 @@ namespace XamFormsRxRouting.Navigation
                 .Do(
                     _ =>
                     {
-                        AddToStackAndTick(this.pageStack, page, resetStack);
+                        AddToStackAndTick(this.currentPageStack, page, resetStack);
                         this.Log().Debug("Added page '{0}' (contract '{1}') to stack.", page.Id, contract);
                     });
         }
 
+        public void InsertPage(int index, IPageViewModel page, string contract = null)
+        {
+            if(page == null)
+            {
+                throw new NullReferenceException("The page you tried to insert is null.");
+            }
+
+            var stack = this.currentPageStack.Value;
+
+            if(index < 0 || index >= stack.Count)
+            {
+                throw new IndexOutOfRangeException(string.Format("Tried to insert a page at index {0}. Stack count: {1}", index, stack.Count));
+            }
+
+            if(stack == null)
+            {
+                throw new InvalidOperationException("Can't insert a page into a modal with no navigation stack.");
+            }
+
+            stack = stack.Insert(index, page);
+            this.currentPageStack.OnNext(stack);
+            this.view.InsertPage(index, page, contract);
+        }
+
         public IObservable<Unit> PopToPage(int index, bool animateLastPage = true)
         {
-            var stack = this.pageStack.Value;
+            var stack = this.currentPageStack.Value;
 
-            Ensure.ArgumentCondition(index >= 0 && index < stack.Count, "Index is out of range.", nameof(index));
+            if(stack == null)
+            {
+                throw new InvalidOperationException("Can't pop a page from a modal with no navigation stack.");
+            }
+
+            if(index < 0 || index >= stack.Count)
+            {
+                throw new IndexOutOfRangeException(string.Format("Tried to pop to page at index {0}. Stack count: {1}", index, stack.Count));
+            }
 
             int idxOfLastPage = stack.Count - 1;
             int numPagesToPop = idxOfLastPage - index;
@@ -77,9 +156,18 @@ namespace XamFormsRxRouting.Navigation
 
         public IObservable<Unit> PopPages(int count = 1, bool animateLastPage = true)
         {
-            Ensure.ArgumentCondition(count > 0 && count < PageCount, "Page pop count should be greater than 0 and less than the size of the stack.", nameof(count));
+            var stack = this.currentPageStack.Value;
 
-            var stack = this.pageStack.Value;
+            if(stack == null)
+            {
+                throw new InvalidOperationException("Can't pop pages from a modal with no navigation stack.");
+            }
+
+            if(count <= 0 || count >= stack.Count)
+            {
+                throw new IndexOutOfRangeException(
+                    string.Format("Page pop count should be greater than 0 and less than the size of the stack. Pop count: {0}. Stack count: {1}", count, stack.Count));
+            }
 
             if(count > 1)
             {
@@ -89,40 +177,57 @@ namespace XamFormsRxRouting.Navigation
                 {
                     this.view.RemovePage(i);
                 }
-
-                stack = stack.RemoveRange(stack.Count - count, count - 1);
-                this.pageStack.OnNext(stack);
             }
 
             // Now remove the top page with optional animation.
             return this
                 .view
-                .PopPage(animateLastPage);
-        }
-
-        public void InsertPage(int index, IPageViewModel page, string contract = null)
-        {
-            var stack = this.pageStack.Value;
-
-            Ensure.ArgumentNotNull(page, nameof(page));
-            Ensure.ArgumentCondition(index >= 0 && index < stack.Count, "Index is out of range.", nameof(index));
-
-            stack = stack.Insert(index, page);
-            this.pageStack.OnNext(stack);
-            this.view.InsertPage(index, page, contract);
-        }
-
-        public IObservable<Unit> PushModal(IModalViewModel modal, string contract = null)
-        {
-            Ensure.ArgumentNotNull(modal, nameof(modal));
-
-            return this
-                .view
-                .PushModal(modal, contract)
+                .PopPage(animateLastPage)
                 .Do(
                     _ =>
                     {
-                        AddToStackAndTick(this.modalStack, modal, false);
+                        stack = stack.RemoveRange(stack.Count - count, count - 1);
+                        this.currentPageStack.OnNext(stack);
+                    });
+        }
+
+        public IObservable<Unit> PushModal(IPageViewModel modal, string contract = null)
+        {
+            if(modal == null)
+            {
+                throw new NullReferenceException("The modal you tried to push is null.");
+            }
+
+            return this
+                .view
+                .PushModal(modal, contract, false)
+                .Do(
+                    _ =>
+                    {
+                        AddToStackAndTick(this.modalPageStack, modal, false);
+                        this.Log().Debug("Added modal '{0}' (contract '{1}') to stack.", modal.Id, contract);
+                    });
+        }
+
+        public IObservable<Unit> PushModal(INavigationPageViewModel modal, string contract = null)
+        {
+            if(modal == null)
+            {
+                throw new NullReferenceException("The modal you tried to insert is null.");
+            }
+
+            if(modal.PageStack.Count <= 0)
+            {
+                throw new InvalidOperationException("Can't push an empty navigation page.");
+            }
+
+            return this
+                .view
+                .PushModal(modal.PageStack[0], contract, true)
+                .Do(
+                    _ =>
+                    {
+                        AddToStackAndTick(this.modalPageStack, modal, false);
                         this.Log().Debug("Added modal '{0}' (contract '{1}') to stack.", modal.Id, contract);
                     });
         }
@@ -134,7 +239,7 @@ namespace XamFormsRxRouting.Navigation
                 .Do(
                     _ =>
                     {
-                        var removedModal = PopStackAndTick(this.modalStack);
+                        var removedModal = PopStackAndTick(this.modalPageStack);
                         this.Log().Debug("Removed modal '{0}' from stack.", removedModal.Id);
                     });
 

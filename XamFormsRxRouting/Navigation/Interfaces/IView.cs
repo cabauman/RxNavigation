@@ -7,6 +7,8 @@ namespace XamFormsRxRouting.Navigation.Interfaces
     {
         IObservable<IPageViewModel> PagePopped { get; }
 
+        IObservable<Unit> ModalPopped { get; }
+
         IObservable<Unit> PushPage(
             IPageViewModel pageViewModel,
             string contract,
@@ -24,8 +26,9 @@ namespace XamFormsRxRouting.Navigation.Interfaces
         void RemovePage(int index);
 
         IObservable<Unit> PushModal(
-            IModalViewModel modalViewModel,
-            string contract);
+            IPageViewModel modalViewModel,
+            string contract,
+            bool withNavStack);
 
         IObservable<Unit> PopModal();
     }

@@ -8,17 +8,20 @@ namespace XamFormsRxRouting.Navigation.Interfaces
     {
         IView View { get; }
 
-        int PageCount { get; }
-
         IObservable<IImmutableList<IPageViewModel>> PageStack { get; }
 
-        IObservable<IImmutableList<IModalViewModel>> ModalStack { get; }
+        IObservable<IImmutableList<IPageViewModel>> ModalStack { get; }
 
         IObservable<Unit> PushPage(
             IPageViewModel page,
             string contract = null,
             bool resetStack = false,
             bool animate = true);
+
+        void InsertPage(
+            int index,
+            IPageViewModel page,
+            string contract = null);
 
         IObservable<Unit> PopToPage(
             int index,
@@ -28,13 +31,12 @@ namespace XamFormsRxRouting.Navigation.Interfaces
             int count = 1,
             bool animateLastPage = true);
 
-        void InsertPage(
-            int index,
-            IPageViewModel page,
+        IObservable<Unit> PushModal(
+            IPageViewModel modal,
             string contract = null);
 
         IObservable<Unit> PushModal(
-            IModalViewModel modal,
+            INavigationPageViewModel modal,
             string contract = null);
 
         IObservable<Unit> PopModal();
