@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<local:BaseContentPage
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:Sample.Common"
+    xmlns:module="clr-namespace:Sample.Modules"
+    x:TypeArguments="module:IHomeViewModel"
+    x:Class="Sample.Modules.HomePage">
+
+    <StackLayout
+        Padding="10"
+        Spacing="8">
+        <!-- Place new controls here -->
+        <Label
+            Text="PUSH"
+            HorizontalOptions="Center" />
+
+        <StackLayout
+            Spacing="8"
+            Orientation="Horizontal">
+            <Button
+                x:Name="PushModalWithNavButton"
+                Text="Modal w/nav"/>
+            <Button
+                x:Name="PushModalWithoutNavButton"
+                Text="Modal w/o nav"/>
+        </StackLayout>
+
+        <StackLayout
+            Spacing="10"
+            Orientation="Horizontal">
+            <Button
+                x:Name="PushPageButton"
+                Text="Push Page"
+                Margin="0,0,8,0"/>
+            <Entry
+                x:Name="PopCountEntry"
+                Placeholder="# of pages to pop"
+                Keyboard="Numeric"
+                HorizontalOptions="FillAndExpand"/>
+            <Button
+                x:Name="PopPagesButton"
+                Text="Pop Pages"/>
+        </StackLayout>
+
+        <Label
+            Text="Insert a page and pop to it."
+            HorizontalOptions="Center"
+            Margin="0,10,0,0"/>
+        <StackLayout
+            Spacing="8"
+            Orientation="Horizontal">
+            <Entry
+                x:Name="InsertPageIndexEntry"
+                Placeholder="Page index to pop to"
+                Keyboard="Numeric"
+                HorizontalOptions="FillAndExpand"/>
+            <Button
+                x:Name="InsertPageButton"
+                Text="Insert Page"/>
+        </StackLayout>
+        <StackLayout
+            Spacing="8"
+            Orientation="Horizontal">
+            <Entry
+                x:Name="PageIndexEntry"
+                Placeholder="Page index to pop to"
+                Keyboard="Numeric"
+                HorizontalOptions="FillAndExpand"/>
+            <Button
+                x:Name="PopToNewPageButton"
+                Text="Pop To Page"/>
+        </StackLayout>
+
+    </StackLayout>
+
+</local:BaseContentPage>
