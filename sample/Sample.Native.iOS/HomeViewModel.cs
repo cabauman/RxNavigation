@@ -3,14 +3,13 @@ using System;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using Sample.Common;
 using RxNavigation;
 
-namespace Sample.Modules
+namespace Sample.Native.iOS
 {
-    public class HomeViewModel : BaseViewModel, IHomeViewModel, IPageViewModel
+    public class HomeViewModel : BaseViewModel, IPageViewModel
     {
-        private int? _popCount;
+        private int? _popCount = 1;
         private int? _pageIndex;
         private ObservableAsPropertyHelper<int> _pageCount;
 
@@ -33,6 +32,12 @@ namespace Sample.Modules
                 () =>
                 {
                     return ViewStackService.PushModal(new HomeViewModel(ViewStackService));
+                });
+
+            PopModal = ReactiveCommand.CreateFromObservable(
+                () =>
+                {
+                    return ViewStackService.PopModal();
                 });
 
             var canPop = this.WhenAnyValue(
@@ -97,6 +102,8 @@ namespace Sample.Modules
         public ReactiveCommand PushModalWithNav { get; }
 
         public ReactiveCommand PushModalWithoutNav { get; }
+
+        public ReactiveCommand PopModal { get; }
 
         public ReactiveCommand<Unit, Unit> PopPages { get; set; }
 

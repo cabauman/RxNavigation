@@ -3,9 +3,9 @@ using Splat;
 using System;
 using System.Reactive.Linq;
 using Xamarin.Forms;
-using XamFormsRxRouting.Interfaces;
 using Sample.Modules;
-using XamFormsRxRouting;
+using RxNavigation;
+using RxNavigation.XamForms;
 
 namespace Sample
 {
@@ -44,7 +44,7 @@ namespace Sample
         private void RegisterViews()
         {
             Locator.CurrentMutable.Register(() => new LoginPage(), typeof(IViewFor<ILoginViewModel>));
-            Locator.CurrentMutable.Register(() => new HomePage(), typeof(IViewFor<IHomeViewModel>));
+            Locator.CurrentMutable.Register(() => new HomePage(), typeof(IViewFor<HomeViewModel>));
         }
     }
 }

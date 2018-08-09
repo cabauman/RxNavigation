@@ -9,6 +9,8 @@ namespace Sample.Modules
 
         int? PageIndex { get; set; }
 
+        int PageCount { get; }
+
         ReactiveCommand PushPage { get; }
 
         ReactiveCommand PushModalWithNav { get; }

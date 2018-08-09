@@ -1,7 +1,7 @@
 ﻿using ReactiveUI;
 using RxNavigation;
 
-namespace Sample.Common
+namespace Sample.Native.iOS
 {
     public class BaseViewModel : ReactiveObject, ISupportsActivation
     {

@@ -5,7 +5,7 @@ using Sample.Common;
 
 namespace Sample.Modules
 {
-	public partial class HomePage : BaseContentPage<IHomeViewModel>
+	public partial class HomePage : BaseContentPage<HomeViewModel>
 	{
 		public HomePage()
 		{
@@ -34,6 +34,9 @@ namespace Sample.Modules
                         .DisposeWith(disposables);
                     this
                         .BindCommand(ViewModel, vm => vm.PopToNewPage, v => v.PopToNewPageButton)
+                        .DisposeWith(disposables);
+                    this
+                        .OneWayBind(ViewModel, vm => vm.PageCount, v => v.PageCountLabel.Text)
                         .DisposeWith(disposables);
                 });
         }

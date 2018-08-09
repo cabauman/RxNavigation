@@ -9,13 +9,12 @@
     <PackageReference Include="ReactiveUI.XamForms" Version="8.3.1" />
     <PackageReference Include="System.Collections.Immutable" Version="1.5.0" />
     <PackageReference Include="System.Reactive" Version="3.1.1" />
-    <PackageReference Include="Xamarin.Forms" Version="3.0.0.561731" />
+    <PackageReference Include="Xamarin.Forms" Version="3.1.0.697729" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="XamFormsRxRouting">
-      <HintPath>..\..\src\XamFormsRxRouting\bin\Debug\netstandard2.0\XamFormsRxRouting.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\..\src\RxNavigation.XamForms\RxNavigation.XamForms.csproj" />
+    <ProjectReference Include="..\..\src\RxNavigation\RxNavigation.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -2,12 +2,11 @@
 using System;
 using System.Reactive;
 using System.Reactive.Linq;
-using Sample.Common;
 using RxNavigation;
 
-namespace Sample.Modules
+namespace Sample.Native.iOS
 {
-    public class LoginViewModel : BaseViewModel, ILoginViewModel, IPageViewModel
+    public class LoginViewModel : BaseViewModel, IPageViewModel
     {
         private string _email;
         private string _password;
