@@ -32,13 +32,15 @@ namespace RxNavigation
 
         static IView CreateRxNavigationPlugin()
         {
-#if NETSTANDARD1_0 || NETSTANDARD2_0
             return null;
-#else
-#pragma warning disable IDE0022 // Use expression body for methods
-            return new MainView(null, null, null);
-#pragma warning restore IDE0022 // Use expression body for methods
-#endif
+
+//#if NETSTANDARD1_0 || NETSTANDARD2_0
+//            return null;
+//#else
+//#pragma warning disable IDE0022 // Use expression body for methods
+//            return new MainView(null, null, null);
+//#pragma warning restore IDE0022 // Use expression body for methods
+//#endif
         }
 
         internal static Exception NotImplementedInReferenceAssembly() =>

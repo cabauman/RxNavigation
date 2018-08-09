@@ -61,15 +61,11 @@ namespace RxNavigation
                 .view
                 .PagePopped
                 .Do(
-                    poppedPage =>
+                    _ =>
                     {
                         var pageStack = this.currentPageStack.Value;
-
-                        if(pageStack.Count > 0 && poppedPage == pageStack[pageStack.Count - 1])
-                        {
-                            var removedPage = PopStackAndTick(this.currentPageStack);
-                            this.Log().Debug("Removed page '{0}' from stack.", removedPage.Id);
-                        }
+                        var removedPage = PopStackAndTick(this.currentPageStack);
+                        this.Log().Debug("Removed page '{0}' from stack.", removedPage.Id);
                     })
                 .Subscribe();
 
@@ -104,6 +100,11 @@ namespace RxNavigation
                 .Do(
                     _ =>
                     {
+                        if(modalPageStack.Value.Count > 0 && modalPageStack.Value[modalPageStack.Value.Count - 1] is INavigationPageViewModel navigationPage)
+                        {
+                            navigationPage.PageStack = navigationPage.PageStack.Add(page);
+                        }
+
                         AddToStackAndTick(this.currentPageStack, page, resetStack);
                         this.Log().Debug("Added page '{0}' (contract '{1}') to stack.", page.Id, contract);
                     });
@@ -176,18 +177,15 @@ namespace RxNavigation
                 {
                     this.view.RemovePage(i);
                 }
+
+                stack = stack.RemoveRange(stack.Count - count, count - 1);
+                this.currentPageStack.OnNext(stack);
             }
 
             // Now remove the top page with optional animation.
             return this
                 .view
-                .PopPage(animateLastPage)
-                .Do(
-                    _ =>
-                    {
-                        stack = stack.RemoveRange(stack.Count - count, count - 1);
-                        this.currentPageStack.OnNext(stack);
-                    });
+                .PopPage(animateLastPage);
         }
 
         public IObservable<Unit> PushModal(IPageViewModel modal, string contract = null)
@@ -234,13 +232,7 @@ namespace RxNavigation
         public IObservable<Unit> PopModal() =>
             this
                 .view
-                .PopModal()
-                .Do(
-                    _ =>
-                    {
-                        var removedModal = PopStackAndTick(this.modalPageStack);
-                        this.Log().Debug("Removed modal '{0}' from stack.", removedModal.Id);
-                    });
+                .PopModal();
 
         private static void AddToStackAndTick<T>(BehaviorSubject<IImmutableList<T>> stackSubject, T item, bool reset)
         {

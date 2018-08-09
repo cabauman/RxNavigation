@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using Xamarin.Forms;
 
@@ -16,8 +17,9 @@ namespace RxNavigation.XamForms
         private readonly IViewLocator viewLocator;
         private readonly IObservable<IPageViewModel> pagePopped;
         private readonly IObservable<Unit> modalPopped;
+        private readonly IObservable<Page> modalPushed;
 
-        private Stack<Xamarin.Forms.NavigationPage> navigationPages;
+        private Stack<NavigationPage> navigationPages;
 
         public MainView(IScheduler backgroundScheduler, IScheduler mainScheduler, IViewLocator viewLocator)
         {
@@ -25,24 +27,41 @@ namespace RxNavigation.XamForms
             this.mainScheduler = mainScheduler ?? RxApp.MainThreadScheduler;
             this.viewLocator = viewLocator ?? ViewLocator.Current;
 
-            this.navigationPages = new Stack<Xamarin.Forms.NavigationPage>();
-            this.navigationPages.Push(this);
+            this.navigationPages = new Stack<NavigationPage>();
 
-            this.pagePopped = Observable
-                .FromEventPattern<NavigationEventArgs>(x => this.Popped += x, x => this.Popped -= x)
-                .Select(ep => ep.EventArgs.Page.BindingContext as IPageViewModel)
-                .Where(x => x != null);
+            this.modalPushed = Observable
+                .FromEventPattern<ModalPushedEventArgs>(
+                    x => Application.Current.ModalPushed += x,
+                    x => Application.Current.ModalPushed -= x)
+                .Select(x => x.EventArgs.Modal);
+
+            this.pagePopped = modalPushed
+                .StartWith(this)
+                .Select(page => page as NavigationPage)
+                .Where(x => x != null)
+                .Do(x => navigationPages.Push(x))
+                .SelectMany(
+                    navigationPage =>
+                    {
+                        return Observable
+                            .FromEventPattern<NavigationEventArgs>(x => navigationPage.Popped += x, x => navigationPage.Popped -= x)
+                            .Select(x => x.EventArgs.Page.BindingContext as IPageViewModel)
+                            .Where(x => x != null);
+                    });
 
             this.modalPopped = Observable
-                .FromEventPattern<ModalPoppedEventArgs>(x => Application.Current.ModalPopped += x, x => Application.Current.ModalPopped -= x)
-                .Select(
-                    ep =>
+                .FromEventPattern<ModalPoppedEventArgs>(
+                    x => Application.Current.ModalPopped += x,
+                    x => Application.Current.ModalPopped -= x)
+                .Do(
+                    x =>
                     {
-                        //var page = ep.EventArgs.Modal.BindingContext as IPageViewModel;
-                        //return page;
-                        return Unit.Default;
-                    });
-            //.WhereNotNull();
+                        if(x.EventArgs.Modal is NavigationPage)
+                        {
+                            navigationPages.Pop();
+                        }
+                    })
+                .Select(x => Unit.Default);
         }
 
         public IObservable<IPageViewModel> PagePopped => this.pagePopped;
@@ -59,8 +78,7 @@ namespace RxNavigation.XamForms
                         this.SetPageTitle(page, modalViewModel.Id);
                         if(withNavStack)
                         {
-                            page = new Xamarin.Forms.NavigationPage(page);
-                            navigationPages.Push(page as NavigationPage);
+                            page = new NavigationPage(page);
                         }
 
                         return page;

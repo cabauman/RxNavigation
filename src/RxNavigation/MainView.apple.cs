@@ -6,19 +6,22 @@ using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
+using System.Threading.Tasks;
 using UIKit;
 
 namespace RxNavigation
 {
-    public sealed class MainView : UINavigationController, IView
+    public sealed class MainView : RxNavigationController, IView
     {
         private readonly IScheduler backgroundScheduler;
         private readonly IScheduler mainScheduler;
         private readonly IViewLocator viewLocator;
         private readonly IObservable<IPageViewModel> pagePopped;
-        private readonly IObservable<Unit> modalPopped;
+        private readonly Subject<Unit> modalPopped;
 
+        private bool instigatedByViewStackService;
         private Stack<UINavigationController> navigationPages;
 
         public MainView(IScheduler backgroundScheduler, IScheduler mainScheduler, IViewLocator viewLocator)
@@ -27,13 +30,42 @@ namespace RxNavigation
             this.mainScheduler = mainScheduler ?? RxApp.MainThreadScheduler;
             this.viewLocator = viewLocator ?? ViewLocator.Current;
 
+            // Each time a RxNavigationController is presented (modally), add a new "controller popped" listener.
+            this.pagePopped = NavigationPagePushed
+                .StartWith(this)
+                .Do(
+                    x =>
+                    {
+                        navigationPages.Push(x);
+                    })
+                .SelectMany(
+                    navigationController =>
+                    {
+                        return navigationController.ControllerPopped
+                            .Select(
+                                viewController =>
+                                {
+                                    var viewFor = viewController as IViewFor;
+                                    return viewFor?.ViewModel as IPageViewModel;
+                                });
+                    });
+
+            ModalPopped
+                .Subscribe(
+                    _ =>
+                    {
+                        navigationPages.Pop();
+
+                        //if(PresentedViewController is RxNavigationController)
+                        //{
+                        //    navigationPages.Pop();
+                        //}
+                    });
+
             this.navigationPages = new Stack<UINavigationController>();
-            this.navigationPages.Push(this);
         }
 
         public IObservable<IPageViewModel> PagePopped => this.pagePopped;
-
-        public IObservable<Unit> ModalPopped => this.modalPopped;
 
         public IObservable<Unit> PushModal(IPageViewModel modalViewModel, string contract, bool withNavStack)
         {
@@ -43,34 +75,36 @@ namespace RxNavigation
                     {
                         UIViewController page = this.LocatePageFor(modalViewModel, contract);
                         this.SetPageTitle(page, modalViewModel.Id);
-                        if(withNavStack)
-                        {
-                            page = new UINavigationController(page);
-                            navigationPages.Push(page as UINavigationController);
-                        }
-
                         return page;
                     },
                     this.backgroundScheduler)
                 .ObserveOn(this.mainScheduler)
                 .SelectMany(
                     page =>
-                        this
+                    {
+                        if(withNavStack)
+                        {
+                            page = new RxNavigationController(page);
+                        }
+
+                        return this
+                            .navigationPages.Peek()
                             .PresentViewControllerAsync(page, true)
-                            .ToObservable());
+                            .ToObservable();
+                    });
         }
 
-        public IObservable<Unit> PopModal() =>
-            this
+        public IObservable<Unit> PopModal()
+        {
+            var controller = this.navigationPages.Peek();
+
+            return controller.PresentingViewController
                 .DismissViewControllerAsync(true)
-                .ToObservable()
-                .Select(_ => Unit.Default)
-                // XF completes the pop operation on a background thread :/
-                .ObserveOn(this.mainScheduler);
+                .ToObservable();
+        }
 
         public IObservable<Unit> PushPage(IPageViewModel pageViewModel, string contract, bool resetStack, bool animate)
         {
-            UIViewController viewController = null;
             return Observable
                 .Start(
                     () =>
@@ -97,10 +131,10 @@ namespace RxNavigation
 
                                     if(resetStack)
                                     {
-                                        this.SetViewControllers(null, false);
+                                        this.navigationPages.Peek().SetViewControllers(null, false);
                                     }
 
-                                    this.PushViewController(viewController, animated: animate);
+                                    this.navigationPages.Peek().PushViewController(page, animated: animate);
 
                                     CATransaction.Commit();
                                     return Disposable.Empty;
@@ -120,7 +154,9 @@ namespace RxNavigation
                             observer.OnCompleted();
                         };
 
-                        this.PopViewController(animated: animate);
+                        //this.instigatedByViewStackService = true;
+                        this.navigationPages.Peek().PopViewController(animated: animate);
+                        //this.instigatedByViewStackService = false;
 
                         CATransaction.Commit();
                         return Disposable.Empty;
@@ -140,11 +176,6 @@ namespace RxNavigation
             var viewControllers = this.navigationPages.Peek().ViewControllers;
             viewControllers = RemoveIndices(viewControllers, index);
             this.navigationPages.Peek().SetViewControllers(viewControllers, false);
-        }
-
-        public override UIViewController PopViewController(bool animated)
-        {
-            return base.PopViewController(animated);
         }
 
         private UIViewController[] RemoveIndices(UIViewController[] indicesArray, int removeAt)
@@ -214,7 +245,7 @@ namespace RxNavigation
         private void SetPageTitle(UIViewController page, string resourceKey)
         {
             //var title = Localize.GetString(resourceKey);
-            page.Title = resourceKey; // title;
+            //page.Title = resourceKey; // title;
         }
     }
 }

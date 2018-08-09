@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Reactive;
 using System.Reactive.Concurrency;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using Android.Support.V4.App;
 using Android.Support.V7.App;
+using Android.Views.Animations;
 using ReactiveUI;
 
 namespace RxNavigation
 {
-    public class MainView : AppCompatActivity, IView
+    public class MainView : FragmentActivity, IView
     {
         private readonly IScheduler backgroundScheduler;
         private readonly IScheduler mainScheduler;
@@ -39,7 +42,19 @@ namespace RxNavigation
 
         public IObservable<Unit> PopPage(bool animate)
         {
-            throw new NotImplementedException();
+            return Observable
+                .Start(
+                    () =>
+                    {
+                        MyFragment frag = new MyFragment();
+                        SupportFragmentManager
+                            .BeginTransaction()
+                            .Remove(null)
+                            .Commit();
+
+                        return frag.WhenPushed;
+                    })
+                .Switch();
         }
 
         public IObservable<Unit> PushModal(IPageViewModel modalViewModel, string contract, bool withNavStack)
@@ -49,17 +64,78 @@ namespace RxNavigation
 
         public IObservable<Unit> PushPage(IPageViewModel pageViewModel, string contract, bool resetStack, bool animate)
         {
-            Fragment frag = new Fragment();
-            SupportFragmentManager.BeginTransaction()
-                .Add(Android.Resource.Id.Content, frag)
-                .Commit();
+            return Observable
+                .Start(
+                    () =>
+                    {
+                        MyFragment frag = new MyFragment();
+                        SupportFragmentManager
+                            .BeginTransaction()
+                            .Add(Android.Resource.Id.Content, frag)
+                            .AddToBackStack("name")
+                            .Commit();
 
-            throw new NotImplementedException();
+                        return frag.WhenPushed;
+                    })
+                .Switch();
         }
 
         public void RemovePage(int index)
         {
             throw new NotImplementedException();
+        }
+    }
+
+
+    public class MyFragment : Fragment, Animation.IAnimationListener
+    {
+        private Subject<Unit> whenPushed;
+        private Subject<Unit> whenPopped;
+        private IObservable<Unit> WhenComplete;
+
+        public MyFragment()
+        {
+        }
+        
+        public IObservable<Unit> WhenPushed
+        {
+            get { return whenPushed.AsObservable(); }
+        }
+
+        public void OnAnimationEnd(Animation animation)
+        {
+            whenPushed.OnNext(Unit.Default);
+            whenPushed.OnCompleted();
+        }
+
+        public void OnAnimationRepeat(Animation animation)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void OnAnimationStart(Animation animation)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Animation OnCreateAnimation(int transit, bool enter, int nextAnim)
+        {
+            Animation anim = base.OnCreateAnimation(transit, enter, nextAnim);
+            //Animation anim = AnimationUtils.LoadAnimation(Activity, nextAnim);
+
+            if(anim == null && nextAnim != 0)
+            {
+                anim = AnimationUtils.LoadAnimation(Activity, nextAnim);
+            }
+
+            WhenComplete = Observable.FromEventPattern<Animation.AnimationEndEventArgs>(
+                h => anim.AnimationEnd += h,
+                h => anim.AnimationEnd -= h)
+                    .Select(_ => Unit.Default)
+                    .Take(1);
+
+            anim.SetAnimationListener(this);
+            return anim;
         }
     }
 }

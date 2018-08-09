@@ -4,6 +4,6 @@ namespace RxNavigation
 {
     public interface INavigationPageViewModel : IPageViewModel
     {
-        IImmutableList<IPageViewModel> PageStack { get; }
+        IImmutableList<IPageViewModel> PageStack { get; set; }
     }
 }
