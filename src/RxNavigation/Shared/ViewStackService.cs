@@ -12,9 +12,9 @@ namespace RxNavigation
     {
         private readonly IView view;
         private readonly BehaviorSubject<IImmutableList<IPageViewModel>> modalPageStack;
-        private readonly BehaviorSubject<IImmutableList<IPageViewModel>> currentPageStack;
+        private BehaviorSubject<IImmutableList<IPageViewModel>> currentPageStack;
 
-        private IImmutableList<IPageViewModel> defaultNavigationStack;
+        private readonly BehaviorSubject<IImmutableList<IPageViewModel>> defaultNavigationStack;
 
         public ViewStackService(IView view)
         {
@@ -23,7 +23,7 @@ namespace RxNavigation
                 throw new NullReferenceException("The view can't be null.");
             }
 
-            this.defaultNavigationStack = ImmutableList<IPageViewModel>.Empty;
+            this.defaultNavigationStack = new BehaviorSubject<IImmutableList<IPageViewModel>>(ImmutableList<IPageViewModel>.Empty);
             this.currentPageStack = new BehaviorSubject<IImmutableList<IPageViewModel>>(ImmutableList<IPageViewModel>.Empty);
             this.modalPageStack = new BehaviorSubject<IImmutableList<IPageViewModel>>(ImmutableList<IPageViewModel>.Empty);
             this.view = view;
@@ -49,13 +49,7 @@ namespace RxNavigation
                                 return this.defaultNavigationStack;
                             }
                         })
-                    .Subscribe(x => this.currentPageStack.OnNext(x));
-
-            this
-                .currentPageStack
-                .Where(_ => this.modalPageStack.Value.Count == 0)
-                .Do(x => this.defaultNavigationStack = x)
-                .Subscribe();
+                    .Subscribe(x => this.currentPageStack = x);
 
             this
                 .view
@@ -63,7 +57,6 @@ namespace RxNavigation
                 .Do(
                     _ =>
                     {
-                        var pageStack = this.currentPageStack.Value;
                         var removedPage = PopStackAndTick(this.currentPageStack);
                         this.Log().Debug("Removed page '{0}' from stack.", removedPage.Id);
                     })
@@ -100,11 +93,6 @@ namespace RxNavigation
                 .Do(
                     _ =>
                     {
-                        if(modalPageStack.Value.Count > 0 && modalPageStack.Value[modalPageStack.Value.Count - 1] is INavigationPageViewModel navigationPage)
-                        {
-                            navigationPage.PageStack = navigationPage.PageStack.Add(page);
-                        }
-
                         AddToStackAndTick(this.currentPageStack, page, resetStack);
                         this.Log().Debug("Added page '{0}' (contract '{1}') to stack.", page.Id, contract);
                     });
@@ -213,14 +201,14 @@ namespace RxNavigation
                 throw new NullReferenceException("The modal you tried to insert is null.");
             }
 
-            if(modal.PageStack.Count <= 0)
+            if(modal.PageStack.Value.Count <= 0)
             {
                 throw new InvalidOperationException("Can't push an empty navigation page.");
             }
 
             return this
                 .view
-                .PushModal(modal.PageStack[0], contract, true)
+                .PushModal(modal.PageStack.Value[0], contract, true)
                 .Do(
                     _ =>
                     {

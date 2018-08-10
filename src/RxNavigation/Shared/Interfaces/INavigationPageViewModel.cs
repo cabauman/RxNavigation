@@ -1,9 +1,10 @@
 ﻿using System.Collections.Immutable;
+using System.Reactive.Subjects;
 
 namespace RxNavigation
 {
     public interface INavigationPageViewModel : IPageViewModel
     {
-        IImmutableList<IPageViewModel> PageStack { get; set; }
+        BehaviorSubject<IImmutableList<IPageViewModel>> PageStack { get; set; }
     }
 }
