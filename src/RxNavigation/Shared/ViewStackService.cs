@@ -12,9 +12,10 @@ namespace RxNavigation
     {
         private readonly IView view;
         private readonly BehaviorSubject<IImmutableList<IPageViewModel>> modalPageStack;
-        private BehaviorSubject<IImmutableList<IPageViewModel>> currentPageStack;
-
         private readonly BehaviorSubject<IImmutableList<IPageViewModel>> defaultNavigationStack;
+        private readonly BehaviorSubject<IImmutableList<IPageViewModel>> emptyPageStack;
+
+        private BehaviorSubject<IImmutableList<IPageViewModel>> currentPageStack;
 
         public ViewStackService(IView view)
         {
@@ -23,9 +24,10 @@ namespace RxNavigation
                 throw new NullReferenceException("The view can't be null.");
             }
 
-            this.defaultNavigationStack = new BehaviorSubject<IImmutableList<IPageViewModel>>(ImmutableList<IPageViewModel>.Empty);
-            this.currentPageStack = new BehaviorSubject<IImmutableList<IPageViewModel>>(ImmutableList<IPageViewModel>.Empty);
             this.modalPageStack = new BehaviorSubject<IImmutableList<IPageViewModel>>(ImmutableList<IPageViewModel>.Empty);
+            this.defaultNavigationStack = new BehaviorSubject<IImmutableList<IPageViewModel>>(ImmutableList<IPageViewModel>.Empty);
+            this.emptyPageStack = new BehaviorSubject<IImmutableList<IPageViewModel>>(ImmutableList<IPageViewModel>.Empty);
+            this.currentPageStack = new BehaviorSubject<IImmutableList<IPageViewModel>>(ImmutableList<IPageViewModel>.Empty);
             this.view = view;
 
             this
@@ -41,7 +43,7 @@ namespace RxNavigation
                                 }
                                 else
                                 {
-                                    return null;
+                                    return emptyPageStack;
                                 }
                             }
                             else

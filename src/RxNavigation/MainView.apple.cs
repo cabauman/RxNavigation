@@ -21,7 +21,9 @@ namespace RxNavigation
         private readonly IObservable<IPageViewModel> pagePopped;
         private readonly Subject<Unit> modalPopped;
         private readonly Subject<RxNavigationController> navigationPagePushed;
-        private readonly Stack<UINavigationController> navigationPages;
+        private readonly Stack<UIViewController> modalStackPlusMainView;
+
+        private UINavigationController currentNavigationController;
 
         public MainView(IScheduler backgroundScheduler, IScheduler mainScheduler, IViewLocator viewLocator)
         {
@@ -30,17 +32,14 @@ namespace RxNavigation
             this.viewLocator = viewLocator ?? ViewLocator.Current;
 
             this.navigationPagePushed = new Subject<RxNavigationController>();
-            this.navigationPages = new Stack<UINavigationController>();
+            this.modalStackPlusMainView = new Stack<UIViewController>();
             this.modalPopped = new Subject<Unit>();
+            modalStackPlusMainView.Push(this);
+            currentNavigationController = this;
 
             // Each time a RxNavigationController is presented (modally), add a new "controller popped" listener.
             this.pagePopped = navigationPagePushed
                 .StartWith(this)
-                .Do(
-                    x =>
-                    {
-                        navigationPages.Push(x);
-                    })
                 .SelectMany(
                     navigationController =>
                     {
@@ -80,14 +79,16 @@ namespace RxNavigation
                         }
 
                         return this
-                            .navigationPages.Peek()
+                            .modalStackPlusMainView.Peek()
                             .PresentViewControllerAsync(viewController, true)
                             .ToObservable()
                             .Do(
                                 x =>
                                 {
+                                    modalStackPlusMainView.Push(viewController);
                                     if(withNavStack)
                                     {
+                                        currentNavigationController = navigationPage;
                                         navigationPagePushed.OnNext(navigationPage);
                                     }
                                 });
@@ -96,7 +97,7 @@ namespace RxNavigation
 
         public IObservable<Unit> PopModal()
         {
-            var controller = this.navigationPages.Peek();
+            var controller = this.modalStackPlusMainView.Pop();
 
             return controller
                 .PresentingViewController
@@ -106,9 +107,13 @@ namespace RxNavigation
                     x =>
                     {
                         this.modalPopped.OnNext(Unit.Default);
-                        if(controller is RxNavigationController)
+                        if(this.modalStackPlusMainView.Peek() is RxNavigationController navigationController)
                         {
-                            this.navigationPages.Pop();
+                            currentNavigationController = navigationController;
+                        }
+                        else
+                        {
+                            currentNavigationController = null;
                         }
                     });
         }
@@ -142,10 +147,10 @@ namespace RxNavigation
 
                                     if(resetStack)
                                     {
-                                        this.navigationPages.Peek().SetViewControllers(null, false);
+                                        currentNavigationController.SetViewControllers(null, false);
                                     }
 
-                                    this.navigationPages.Peek().PushViewController(page, animated: animate);
+                                    currentNavigationController.PushViewController(page, animated: animate);
 
                                     CATransaction.Commit();
                                     return Disposable.Empty;
@@ -165,7 +170,7 @@ namespace RxNavigation
                             observer.OnCompleted();
                         };
 
-                        this.navigationPages.Peek().PopViewController(animated: animate);
+                        currentNavigationController.PopViewController(animated: animate);
 
                         CATransaction.Commit();
                         return Disposable.Empty;
@@ -175,16 +180,16 @@ namespace RxNavigation
         {
             var page = this.LocatePageFor(pageViewModel, contract);
             this.SetPageTitle(page, pageViewModel.Id);
-            var viewControllers = this.navigationPages.Peek().ViewControllers;
+            var viewControllers = currentNavigationController.ViewControllers;
             viewControllers = InsertIndices(viewControllers, page, index);
-            this.navigationPages.Peek().SetViewControllers(viewControllers, false);
+            currentNavigationController.SetViewControllers(viewControllers, false);
         }
 
         public void RemovePage(int index)
         {
-            var viewControllers = this.navigationPages.Peek().ViewControllers;
+            var viewControllers = currentNavigationController.ViewControllers;
             viewControllers = RemoveIndices(viewControllers, index);
-            this.navigationPages.Peek().SetViewControllers(viewControllers, false);
+            currentNavigationController.SetViewControllers(viewControllers, false);
         }
 
         private UIViewController[] RemoveIndices(UIViewController[] indicesArray, int removeAt)
