@@ -60,7 +60,7 @@ namespace RxNavigation
                     _ =>
                     {
                         var removedPage = PopStackAndTick(this.currentPageStack);
-                        this.Log().Debug("Removed page '{0}' from stack.", removedPage.Id);
+                        this.Log().Debug("Removed page '{0}' from stack.", removedPage.Title);
                     })
                 .Subscribe();
 
@@ -71,7 +71,7 @@ namespace RxNavigation
                     _ =>
                     {
                         var removedPage = PopStackAndTick(this.modalPageStack);
-                        this.Log().Debug("Removed modal page '{0}' from stack.", removedPage.Id);
+                        this.Log().Debug("Removed modal page '{0}' from stack.", removedPage.Title);
                     })
                 .Subscribe();
         }
@@ -96,7 +96,7 @@ namespace RxNavigation
                     _ =>
                     {
                         AddToStackAndTick(this.currentPageStack, page, resetStack);
-                        this.Log().Debug("Added page '{0}' (contract '{1}') to stack.", page.Id, contract);
+                        this.Log().Debug("Added page '{0}' (contract '{1}') to stack.", page.Title, contract);
                     });
         }
 
@@ -192,7 +192,7 @@ namespace RxNavigation
                     _ =>
                     {
                         AddToStackAndTick(this.modalPageStack, modal, false);
-                        this.Log().Debug("Added modal '{0}' (contract '{1}') to stack.", modal.Id, contract);
+                        this.Log().Debug("Added modal '{0}' (contract '{1}') to stack.", modal.Title, contract);
                     });
         }
 
@@ -215,7 +215,7 @@ namespace RxNavigation
                     _ =>
                     {
                         AddToStackAndTick(this.modalPageStack, modal, false);
-                        this.Log().Debug("Added modal '{0}' (contract '{1}') to stack.", modal.Id, contract);
+                        this.Log().Debug("Added modal '{0}' (contract '{1}') to stack.", modal.Title, contract);
                     });
         }
 

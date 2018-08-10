@@ -1,4 +1,5 @@
 ﻿using CoreAnimation;
+using Foundation;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
@@ -71,7 +72,7 @@ namespace RxNavigation
                 .SelectMany(
                     viewController =>
                     {
-                        this.SetPageTitle(viewController, modalViewModel.Id);
+                        viewController.Title = modalViewModel.Title;
                         RxNavigationController navigationPage = null;
                         if(withNavStack)
                         {
@@ -132,7 +133,7 @@ namespace RxNavigation
                 .SelectMany(
                     page =>
                     {
-                        this.SetPageTitle(page, pageViewModel.Id);
+                        page.Title = pageViewModel.Title;
 
                         return Observable
                             .Create<Unit>(
@@ -179,7 +180,7 @@ namespace RxNavigation
         public void InsertPage(int index, IPageViewModel pageViewModel, string contract = null)
         {
             var page = this.LocatePageFor(pageViewModel, contract);
-            this.SetPageTitle(page, pageViewModel.Id);
+            page.Title = pageViewModel.Title;
             var viewControllers = currentNavigationController.ViewControllers;
             viewControllers = InsertIndices(viewControllers, page, index);
             currentNavigationController.SetViewControllers(viewControllers, false);
@@ -254,12 +255,6 @@ namespace RxNavigation
             viewFor.ViewModel = viewModel;
 
             return page;
-        }
-
-        private void SetPageTitle(UIViewController page, string resourceKey)
-        {
-            //var title = Localize.GetString(resourceKey);
-            page.Title = resourceKey; // title;
         }
     }
 }

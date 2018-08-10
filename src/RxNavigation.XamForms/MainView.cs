@@ -6,6 +6,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
+using System.Reflection;
 using Xamarin.Forms;
 
 namespace RxNavigation.XamForms
@@ -75,7 +76,7 @@ namespace RxNavigation.XamForms
                     () =>
                     {
                         var page = this.LocatePageFor(modalViewModel, contract);
-                        this.SetPageTitle(page, modalViewModel.Id);
+                        page.Title = modalViewModel.Title;
                         if(withNavStack)
                         {
                             page = new NavigationPage(page);
@@ -115,7 +116,7 @@ namespace RxNavigation.XamForms
                     () =>
                     {
                         var page = this.LocatePageFor(pageViewModel, contract);
-                        this.SetPageTitle(page, pageViewModel.Id);
+                        page.Title = pageViewModel.Title;
                         return page;
                     },
                     backgroundScheduler)
@@ -175,7 +176,7 @@ namespace RxNavigation.XamForms
         public void InsertPage(int index, IPageViewModel pageViewModel, string contract = null)
         {
             var page = this.LocatePageFor(pageViewModel, contract);
-            this.SetPageTitle(page, pageViewModel.Id);
+            page.Title = pageViewModel.Title;
             var currentNavigationPage = this.navigationPages.Peek();
             currentNavigationPage.Navigation.InsertPageBefore(page, currentNavigationPage.Navigation.NavigationStack[index]);
         }
@@ -204,12 +205,6 @@ namespace RxNavigation.XamForms
             viewFor.ViewModel = viewModel;
 
             return page;
-        }
-
-        private void SetPageTitle(Page page, string resourceKey)
-        {
-            //var title = Localize.GetString(resourceKey);
-            page.Title = resourceKey; // title;
         }
     }
 }

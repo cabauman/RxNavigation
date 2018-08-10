@@ -76,7 +76,7 @@ namespace Sample.Modules
                 });
         }
 
-        public string Id => nameof(HomeViewModel);
+        public string Title => "Home";
 
         public int? PopCount
         {

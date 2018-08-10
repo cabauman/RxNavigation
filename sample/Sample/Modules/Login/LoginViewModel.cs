@@ -48,7 +48,7 @@ namespace Sample.Modules
                 canCancel);
         }
 
-        public string Id => nameof(LoginViewModel);
+        public string Title => "Login";
 
         public string Email
         {

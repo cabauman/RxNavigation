@@ -11,7 +11,7 @@ namespace RxNavigation
             this.PageStack = new BehaviorSubject<IImmutableList<IPageViewModel>>(contents);
         }
 
-        public string Id => PageStack.Value[0].Id;
+        public string Title => PageStack.Value[0].Title;
 
         public BehaviorSubject<IImmutableList<IPageViewModel>> PageStack { get; set; }
     }
