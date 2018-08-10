@@ -13,22 +13,18 @@ namespace RxNavigation
         private readonly IView view;
         private readonly BehaviorSubject<IImmutableList<IPageViewModel>> modalPageStack;
         private readonly BehaviorSubject<IImmutableList<IPageViewModel>> defaultNavigationStack;
-        private readonly BehaviorSubject<IImmutableList<IPageViewModel>> emptyPageStack;
+        private readonly BehaviorSubject<IImmutableList<IPageViewModel>> nullPageStack;
 
         private BehaviorSubject<IImmutableList<IPageViewModel>> currentPageStack;
 
         public ViewStackService(IView view)
         {
-            if(view == null)
-            {
-                throw new NullReferenceException("The view can't be null.");
-            }
+            this.view = view ?? throw new NullReferenceException("The view can't be null.");
 
             this.modalPageStack = new BehaviorSubject<IImmutableList<IPageViewModel>>(ImmutableList<IPageViewModel>.Empty);
             this.defaultNavigationStack = new BehaviorSubject<IImmutableList<IPageViewModel>>(ImmutableList<IPageViewModel>.Empty);
-            this.emptyPageStack = new BehaviorSubject<IImmutableList<IPageViewModel>>(ImmutableList<IPageViewModel>.Empty);
+            this.nullPageStack = new BehaviorSubject<IImmutableList<IPageViewModel>>(null);
             this.currentPageStack = new BehaviorSubject<IImmutableList<IPageViewModel>>(ImmutableList<IPageViewModel>.Empty);
-            this.view = view;
 
             this
                 .modalPageStack
@@ -43,7 +39,7 @@ namespace RxNavigation
                                 }
                                 else
                                 {
-                                    return emptyPageStack;
+                                    return nullPageStack;
                                 }
                             }
                             else
@@ -109,14 +105,14 @@ namespace RxNavigation
 
             var stack = this.currentPageStack.Value;
 
-            if(index < 0 || index >= stack.Count)
-            {
-                throw new IndexOutOfRangeException(string.Format("Tried to insert a page at index {0}. Stack count: {1}", index, stack.Count));
-            }
-
             if(stack == null)
             {
                 throw new InvalidOperationException("Can't insert a page into a modal with no navigation stack.");
+            }
+
+            if(index < 0 || index >= stack.Count)
+            {
+                throw new IndexOutOfRangeException(string.Format("Tried to insert a page at index {0}. Stack count: {1}", index, stack.Count));
             }
 
             stack = stack.Insert(index, page);
@@ -219,10 +215,12 @@ namespace RxNavigation
                     });
         }
 
-        public IObservable<Unit> PopModal() =>
-            this
+        public IObservable<Unit> PopModal()
+        {
+            return this
                 .view
                 .PopModal();
+        }
 
         private static void AddToStackAndTick<T>(BehaviorSubject<IImmutableList<T>> stackSubject, T item, bool reset)
         {
