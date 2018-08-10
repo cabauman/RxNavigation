@@ -20,9 +20,8 @@ namespace RxNavigation
         private readonly IViewLocator viewLocator;
         private readonly IObservable<IPageViewModel> pagePopped;
         private readonly Subject<Unit> modalPopped;
-
-        private bool instigatedByViewStackService;
-        private Stack<UINavigationController> navigationPages;
+        private readonly Subject<RxNavigationController> navigationPagePushed;
+        private readonly Stack<UINavigationController> navigationPages;
 
         public MainView(IScheduler backgroundScheduler, IScheduler mainScheduler, IViewLocator viewLocator)
         {
@@ -30,8 +29,12 @@ namespace RxNavigation
             this.mainScheduler = mainScheduler ?? RxApp.MainThreadScheduler;
             this.viewLocator = viewLocator ?? ViewLocator.Current;
 
+            this.navigationPagePushed = new Subject<RxNavigationController>();
+            this.navigationPages = new Stack<UINavigationController>();
+            this.modalPopped = new Subject<Unit>();
+
             // Each time a RxNavigationController is presented (modally), add a new "controller popped" listener.
-            this.pagePopped = NavigationPagePushed
+            this.pagePopped = navigationPagePushed
                 .StartWith(this)
                 .Do(
                     x =>
@@ -49,23 +52,11 @@ namespace RxNavigation
                                     return viewFor?.ViewModel as IPageViewModel;
                                 });
                     });
-
-            ModalPopped
-                .Subscribe(
-                    _ =>
-                    {
-                        navigationPages.Pop();
-
-                        //if(PresentedViewController is RxNavigationController)
-                        //{
-                        //    navigationPages.Pop();
-                        //}
-                    });
-
-            this.navigationPages = new Stack<UINavigationController>();
         }
 
         public IObservable<IPageViewModel> PagePopped => this.pagePopped;
+
+        public IObservable<Unit> ModalPopped => this.modalPopped.AsObservable();
 
         public IObservable<Unit> PushModal(IPageViewModel modalViewModel, string contract, bool withNavStack)
         {
@@ -74,23 +65,32 @@ namespace RxNavigation
                     () =>
                     {
                         UIViewController page = this.LocatePageFor(modalViewModel, contract);
-                        this.SetPageTitle(page, modalViewModel.Id);
                         return page;
                     },
                     this.backgroundScheduler)
                 .ObserveOn(this.mainScheduler)
                 .SelectMany(
-                    page =>
+                    viewController =>
                     {
+                        this.SetPageTitle(viewController, modalViewModel.Id);
+                        RxNavigationController navigationPage = null;
                         if(withNavStack)
                         {
-                            page = new RxNavigationController(page);
+                            viewController = navigationPage = new RxNavigationController(viewController);
                         }
 
                         return this
                             .navigationPages.Peek()
-                            .PresentViewControllerAsync(page, true)
-                            .ToObservable();
+                            .PresentViewControllerAsync(viewController, true)
+                            .ToObservable()
+                            .Do(
+                                x =>
+                                {
+                                    if(withNavStack)
+                                    {
+                                        navigationPagePushed.OnNext(navigationPage);
+                                    }
+                                });
                     });
         }
 
@@ -98,9 +98,19 @@ namespace RxNavigation
         {
             var controller = this.navigationPages.Peek();
 
-            return controller.PresentingViewController
+            return controller
+                .PresentingViewController
                 .DismissViewControllerAsync(true)
-                .ToObservable();
+                .ToObservable()
+                .Do(
+                    x =>
+                    {
+                        this.modalPopped.OnNext(Unit.Default);
+                        if(controller is RxNavigationController)
+                        {
+                            this.navigationPages.Pop();
+                        }
+                    });
         }
 
         public IObservable<Unit> PushPage(IPageViewModel pageViewModel, string contract, bool resetStack, bool animate)
@@ -110,7 +120,6 @@ namespace RxNavigation
                     () =>
                     {
                         var page = this.LocatePageFor(pageViewModel, contract);
-                        this.SetPageTitle(page, pageViewModel.Id);
                         return page;
                     },
                     backgroundScheduler)
@@ -118,6 +127,8 @@ namespace RxNavigation
                 .SelectMany(
                     page =>
                     {
+                        this.SetPageTitle(page, pageViewModel.Id);
+
                         return Observable
                             .Create<Unit>(
                                 observer =>
@@ -154,9 +165,7 @@ namespace RxNavigation
                             observer.OnCompleted();
                         };
 
-                        //this.instigatedByViewStackService = true;
                         this.navigationPages.Peek().PopViewController(animated: animate);
-                        //this.instigatedByViewStackService = false;
 
                         CATransaction.Commit();
                         return Disposable.Empty;
@@ -245,7 +254,7 @@ namespace RxNavigation
         private void SetPageTitle(UIViewController page, string resourceKey)
         {
             //var title = Localize.GetString(resourceKey);
-            //page.Title = resourceKey; // title;
+            page.Title = resourceKey; // title;
         }
     }
 }
