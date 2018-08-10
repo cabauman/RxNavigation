@@ -88,6 +88,7 @@ namespace Sample.Native.iOS
         public UIButton PushPageButton;
         public UIButton PopPageButton;
         public UIButton PresentPageButton;
+        public UIButton PresentNavigationPageButton;
         public UIButton DismissPageButton;
 
         public HomeViewController()
@@ -122,7 +123,10 @@ namespace Sample.Native.iOS
                         .BindCommand(ViewModel, vm => vm.PopPages, v => v.PopPageButton)
                         .DisposeWith(disposables);
                     this
-                        .BindCommand(ViewModel, vm => vm.PushModalWithNav, v => v.PresentPageButton)
+                        .BindCommand(ViewModel, vm => vm.PushModalWithoutNav, v => v.PresentPageButton)
+                        .DisposeWith(disposables);
+                    this
+                        .BindCommand(ViewModel, vm => vm.PushModalWithNav, v => v.PresentNavigationPageButton)
                         .DisposeWith(disposables);
                     this
                         .BindCommand(ViewModel, vm => vm.PopModal, v => v.DismissPageButton)
@@ -133,7 +137,7 @@ namespace Sample.Native.iOS
 
 
             PushPageButton = new UIButton(UIButtonType.System);
-            PushPageButton.Frame = new CGRect(25, 25, 300, 50);
+            PushPageButton.Frame = new CGRect(25, 75, 300, 50);
             PushPageButton.SetTitle("Push Page!", UIControlState.Normal);
             PushPageButton.SetTitleShadowColor(UIColor.Black, UIControlState.Normal);
             PushPageButton.BackgroundColor = UIColor.Orange;
@@ -141,21 +145,28 @@ namespace Sample.Native.iOS
             PushPageButton.HeightAnchor.ConstraintEqualTo(20).Active = true;
 
             PopPageButton = new UIButton(UIButtonType.System);
-            PopPageButton.Frame = new CGRect(25, 100, 300, 50);
+            PopPageButton.Frame = new CGRect(25, 150, 300, 50);
             PopPageButton.SetTitle("Pop Page", UIControlState.Normal);
             PopPageButton.BackgroundColor = UIColor.Orange;
             PopPageButton.WidthAnchor.ConstraintEqualTo(View.Frame.Width).Active = true;
             PopPageButton.HeightAnchor.ConstraintEqualTo(20).Active = true;
 
             PresentPageButton = new UIButton(UIButtonType.System);
-            PresentPageButton.Frame = new CGRect(25, 175, 300, 50);
+            PresentPageButton.Frame = new CGRect(25, 225, 300, 50);
             PresentPageButton.SetTitle("Present Page", UIControlState.Normal);
             PresentPageButton.BackgroundColor = UIColor.Orange;
             PresentPageButton.WidthAnchor.ConstraintEqualTo(View.Frame.Width).Active = true;
             PresentPageButton.HeightAnchor.ConstraintEqualTo(20).Active = true;
 
+            PresentNavigationPageButton = new UIButton(UIButtonType.System);
+            PresentNavigationPageButton.Frame = new CGRect(25, 300, 300, 50);
+            PresentNavigationPageButton.SetTitle("Present Navigation Page", UIControlState.Normal);
+            PresentNavigationPageButton.BackgroundColor = UIColor.Orange;
+            PresentNavigationPageButton.WidthAnchor.ConstraintEqualTo(View.Frame.Width).Active = true;
+            PresentNavigationPageButton.HeightAnchor.ConstraintEqualTo(20).Active = true;
+
             DismissPageButton = new UIButton(UIButtonType.System);
-            DismissPageButton.Frame = new CGRect(25, 250, 300, 50);
+            DismissPageButton.Frame = new CGRect(25, 375, 300, 50);
             DismissPageButton.SetTitle("Dismiss Page", UIControlState.Normal);
             DismissPageButton.BackgroundColor = UIColor.Orange;
             DismissPageButton.WidthAnchor.ConstraintEqualTo(View.Frame.Width).Active = true;
@@ -164,6 +175,7 @@ namespace Sample.Native.iOS
             View.AddSubview(PushPageButton);
             View.AddSubview(PopPageButton);
             View.AddSubview(PresentPageButton);
+            View.AddSubview(PresentNavigationPageButton);
             View.AddSubview(DismissPageButton);
         }
     }
