@@ -1,9 +1,10 @@
 ﻿using System;
 using Foundation;
 using ReactiveUI;
-using RxNavigation;
+using GameCtor.RxNavigation;
 using Splat;
 using UIKit;
+using GameCtor.RxNavigation;
 
 namespace Sample.Native.iOS
 {

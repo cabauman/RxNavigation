@@ -1,7 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Reactive.Subjects;
 
-namespace RxNavigation
+namespace GameCtor.RxNavigation
 {
     public sealed class NavigationPageViewModel : INavigationPageViewModel
     {

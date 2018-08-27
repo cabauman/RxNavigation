@@ -8,9 +8,9 @@
     <!--Feel free to add as many targets as you need below
     netstandard1.0;netstandard2.0;MonoAndroid80;Xamarin.iOS10;uap10.0.16299;Xamarin.TVOS10;Xamarin.WatchOS10;Xamarin.Mac20;Tizen40;netstandard1.0;
     -->
-    <AssemblyName>RxNavigation</AssemblyName>
-    <RootNamespace>RxNavigation</RootNamespace>
-    <PackageId>RxNavigation</PackageId>
+    <AssemblyName>GameCtor.RxNavigation</AssemblyName>
+    <RootNamespace>GameCtor.RxNavigation</RootNamespace>
+    <PackageId>GameCtor.RxNavigation</PackageId>
     
     <Product>$(AssemblyName) ($(TargetFramework))</Product>
     <AssemblyVersion>1.0.0</AssemblyVersion>

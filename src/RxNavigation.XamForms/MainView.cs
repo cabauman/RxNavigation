@@ -9,7 +9,7 @@ using System.Reactive.Threading.Tasks;
 using System.Reflection;
 using Xamarin.Forms;
 
-namespace RxNavigation.XamForms
+namespace GameCtor.RxNavigation.XamForms
 {
     public sealed class MainView : Xamarin.Forms.NavigationPage, IView
     {

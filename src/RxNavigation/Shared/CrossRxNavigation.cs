@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RxNavigation
+namespace GameCtor.RxNavigation
 {
     /// <summary>
     /// Cross RxRoutingPlugin

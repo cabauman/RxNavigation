@@ -2,7 +2,7 @@
 using System;
 using System.Reactive;
 using System.Reactive.Linq;
-using RxNavigation;
+using GameCtor.RxNavigation;
 
 namespace Sample.Native.iOS
 {
@@ -47,7 +47,7 @@ namespace Sample.Native.iOS
                 canCancel);
         }
 
-        public string Id => nameof(LoginViewModel);
+        public string Title => nameof(LoginViewModel);
 
         public string Email
         {

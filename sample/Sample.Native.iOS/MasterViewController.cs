@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UIKit;
 using Foundation;
 using Splat;
-using RxNavigation;
+using GameCtor.RxNavigation;
 
 namespace Sample.Native.iOS
 {

@@ -3,7 +3,7 @@ using System;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using RxNavigation;
+using GameCtor.RxNavigation;
 
 namespace Sample.Native.iOS
 {
@@ -81,7 +81,7 @@ namespace Sample.Native.iOS
                 });
         }
 
-        public string Id => nameof(HomeViewModel);
+        public string Title => nameof(HomeViewModel);
 
         public int? PopCount
         {

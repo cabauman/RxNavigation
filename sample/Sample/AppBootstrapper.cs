@@ -4,8 +4,8 @@ using System;
 using System.Reactive.Linq;
 using Xamarin.Forms;
 using Sample.Modules;
-using RxNavigation;
-using RxNavigation.XamForms;
+using GameCtor.RxNavigation;
+using GameCtor.RxNavigation.XamForms;
 
 namespace Sample
 {

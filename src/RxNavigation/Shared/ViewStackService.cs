@@ -6,7 +6,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 
-namespace RxNavigation
+namespace GameCtor.RxNavigation
 {
     public sealed class ViewStackService : IViewStackService, IEnableLogger
     {

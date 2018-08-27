@@ -10,7 +10,7 @@ using Android.Support.V7.App;
 using Plugin.CurrentActivity;
 using ReactiveUI;
 
-namespace RxNavigation
+namespace GameCtor.RxNavigation
 {
     public class MainActivityView : IView
     {

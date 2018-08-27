@@ -12,7 +12,7 @@ using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using UIKit;
 
-namespace RxNavigation
+namespace GameCtor.RxNavigation
 {
     public sealed class MainView : RxNavigationController, IView
     {

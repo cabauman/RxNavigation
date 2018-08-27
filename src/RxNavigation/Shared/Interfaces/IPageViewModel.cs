@@ -1,4 +1,4 @@
-﻿namespace RxNavigation
+﻿namespace GameCtor.RxNavigation
 {
     public interface IPageViewModel
     {

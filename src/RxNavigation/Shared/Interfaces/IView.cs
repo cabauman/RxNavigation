@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reactive;
 
-namespace RxNavigation
+namespace GameCtor.RxNavigation
 {
     public interface IView
     {

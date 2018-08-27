@@ -8,7 +8,7 @@ using Android.Support.V7.App;
 using Android.Views.Animations;
 using ReactiveUI;
 
-namespace RxNavigation
+namespace GameCtor.RxNavigation
 {
     public class MainView : FragmentActivity, IView
     {

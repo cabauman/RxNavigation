@@ -2,7 +2,7 @@
 using System.Collections.Immutable;
 using System.Reactive;
 
-namespace RxNavigation
+namespace GameCtor.RxNavigation
 {
     public interface IViewStackService
     {

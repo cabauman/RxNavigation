@@ -3,7 +3,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using UIKit;
 
-namespace RxNavigation
+namespace GameCtor.RxNavigation
 {
     public class RxNavigationController : UINavigationController
     {

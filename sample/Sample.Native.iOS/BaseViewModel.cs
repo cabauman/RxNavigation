@@ -1,5 +1,5 @@
 ﻿using ReactiveUI;
-using RxNavigation;
+using GameCtor.RxNavigation;
 
 namespace Sample.Native.iOS
 {
