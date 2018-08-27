@@ -10,13 +10,13 @@
     -->
     <AssemblyName>RxNavigation</AssemblyName>
     <RootNamespace>RxNavigation</RootNamespace>
-    <PackageId>Plugin.RxRoutingPlugin</PackageId>
+    <PackageId>RxNavigation</PackageId>
     
     <Product>$(AssemblyName) ($(TargetFramework))</Product>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <AssemblyFileVersion>1.0.0.0</AssemblyFileVersion>
-    <Version>1.0.0.0</Version>
-    <PackageVersion>1.0.0.0</PackageVersion>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <AssemblyFileVersion>1.0.0</AssemblyFileVersion>
+    <Version>1.0.0.</Version>
+    <PackageVersion>1.0.0.</PackageVersion>
     <PackOnBuild>true</PackOnBuild>
     <NeutralLanguage>en</NeutralLanguage>
     <LangVersion>default</LangVersion>
@@ -29,19 +29,19 @@
     
     <!--TODO: Fill these in-->
     <PackageLicenseUrl>LINK TO LICENSE</PackageLicenseUrl>
-    <PackageProjectUrl>LINK TO PROJECT</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/cabauman/RxNavigation</PackageProjectUrl>
     <RepositoryUrl>LINK TO PROJECT</RepositoryUrl>
-    <PackageReleaseNotes>RELEASE NOTES</PackageReleaseNotes>
+    <PackageReleaseNotes>Initial release</PackageReleaseNotes>
     <PackageIconUrl>ICON URL</PackageIconUrl>
-    <PackageTags>xamarin, windows, ios, android, xamarin.forms, plugin, RxRoutingPlugin</PackageTags>
+    <PackageTags>xamarin, ios, android, xamarin.forms, RxNavigation, reactive</PackageTags>
     
-    <Title>RxNavigation Plugin for Xamarin and Windows</Title>
-    <Summary>Summary of nuget</Summary>
-    <Description>Plugin Description</Description>
+    <Title>RxNavigation Plugin for Xamarin</Title>
+    <Summary>Custom navigation for Xamarin using Reactive Extensions</Summary>
+    <Description>Custom navigation for Xamarin using Reactive Extensions</Description>
     
     
-    <Owners>YOU</Owners>
-    <Authors>YOU</Authors>
+    <Owners>Colt Alan Bauman</Owners>
+    <Authors>Colt Alan Bauman</Authors>
     <Copyright>Copyright 2018</Copyright>
   </PropertyGroup>
 
