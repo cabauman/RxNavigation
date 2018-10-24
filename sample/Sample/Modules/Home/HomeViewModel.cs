@@ -57,7 +57,7 @@ namespace Sample.Modules
                 {
                     return Observable
                         .Start(() => ViewStackService.InsertPage(PageIndex ?? 0, new LoginViewModel(ViewStackService)), RxApp.MainThreadScheduler)
-                        .Concat(ViewStackService.PopToPage(PageIndex ?? 0));
+                        .SelectMany(_ => ViewStackService.PopToPage(PageIndex ?? 0));
                 },
                 canPopToNewPage);
 
