@@ -10,13 +10,13 @@ using ReactiveUI;
 
 namespace GameCtor.RxNavigation
 {
-    public class MainView : FragmentActivity, IViewShell
+    public class ViewShell : FragmentActivity, IViewShell
     {
         private readonly IScheduler backgroundScheduler;
         private readonly IScheduler mainScheduler;
         private readonly IViewLocator viewLocator;
 
-        public MainView(IScheduler backgroundScheduler, IScheduler mainScheduler, IViewLocator viewLocator)
+        public ViewShell(IScheduler backgroundScheduler, IScheduler mainScheduler, IViewLocator viewLocator)
         {
             this.backgroundScheduler = backgroundScheduler ?? RxApp.TaskpoolScheduler;
             this.mainScheduler = mainScheduler ?? RxApp.MainThreadScheduler;

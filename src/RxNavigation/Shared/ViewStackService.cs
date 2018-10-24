@@ -8,6 +8,9 @@ using System.Reactive.Subjects;
 
 namespace GameCtor.RxNavigation
 {
+    /// <summary>
+    /// Service that manages a stack of views.
+    /// </summary>
     public sealed class ViewStackService : IViewStackService, IEnableLogger
     {
         private readonly IViewShell viewShell;
@@ -17,9 +20,13 @@ namespace GameCtor.RxNavigation
 
         private BehaviorSubject<IImmutableList<IPageViewModel>> currentPageStack;
 
-        public ViewStackService(IViewShell view)
+        /// <summary>
+        /// Creates an instance of ViewStackService.
+        /// </summary>
+        /// <param name="viewShell">The view shell (platform specific).</param>
+        public ViewStackService(IViewShell viewShell)
         {
-            this.viewShell = view ?? throw new NullReferenceException("The view can't be null.");
+            this.viewShell = viewShell ?? throw new NullReferenceException("The viewShell can't be null.");
 
             this.modalPageStack = new BehaviorSubject<IImmutableList<IPageViewModel>>(ImmutableList<IPageViewModel>.Empty);
             this.defaultNavigationStack = new BehaviorSubject<IImmutableList<IPageViewModel>>(ImmutableList<IPageViewModel>.Empty);
@@ -72,12 +79,29 @@ namespace GameCtor.RxNavigation
                 .Subscribe();
         }
 
-        public IViewShell View => this.viewShell;
+        /// <summary>
+        /// Gets the current view shell (platform-specific).
+        /// </summary>
+        public IViewShell ViewShell => this.viewShell;
 
+        /// <summary>
+        /// Gets the current page stack.
+        /// </summary>
         public IObservable<IImmutableList<IPageViewModel>> PageStack => this.currentPageStack;
 
+        /// <summary>
+        /// Gets the modal stack.
+        /// </summary>
         public IObservable<IImmutableList<IPageViewModel>> ModalStack => this.modalPageStack;
 
+        /// <summary>
+        /// Pushes a page onto the current page stack.
+        /// </summary>
+        /// <param name="page">A page view model.</param>
+        /// <param name="contract">A page contract.</param>
+        /// <param name="resetStack">A flag signalling if the page stack should be reset.</param>
+        /// <param name="animate">A flag signalling if the push should be animated.</param>
+        /// <returns>An observable that signals the completion of this action.</returns>
         public IObservable<Unit> PushPage(IPageViewModel page, string contract = null, bool resetStack = false, bool animate = true)
         {
             if(this.currentPageStack.Value == null)
@@ -96,6 +120,12 @@ namespace GameCtor.RxNavigation
                     });
         }
 
+        /// <summary>
+        /// Inserts a page into the current page stack at the given index.
+        /// </summary>
+        /// <param name="index">An insertion index.</param>
+        /// <param name="page">A page view model.</param>
+        /// <param name="contract">A page contract.</param>
         public void InsertPage(int index, IPageViewModel page, string contract = null)
         {
             if(page == null)
@@ -120,6 +150,12 @@ namespace GameCtor.RxNavigation
             this.viewShell.InsertPage(index, page, contract);
         }
 
+        /// <summary>
+        /// Pops to the page at the given index.
+        /// </summary>
+        /// <param name="index">The index of the page to pop to.</param>
+        /// <param name="animateLastPage">A flag signalling if the final pop should be animated.</param>
+        /// <returns>An observable that signals the completion of this action.</returns>
         public IObservable<Unit> PopToPage(int index, bool animateLastPage = true)
         {
             var stack = this.currentPageStack.Value;
@@ -140,6 +176,12 @@ namespace GameCtor.RxNavigation
             return PopPages(numPagesToPop, animateLastPage);
         }
 
+        /// <summary>
+        /// Pops the given number of pages from the top of the current page stack.
+        /// </summary>
+        /// <param name="count">The number of pages to pop.</param>
+        /// <param name="animateLastPage">A flag signalling if the final pop should be animated.</param>
+        /// <returns>An observable that signals the completion of this action.</returns>
         public IObservable<Unit> PopPages(int count = 1, bool animateLastPage = true)
         {
             var stack = this.currentPageStack.Value;
@@ -174,6 +216,12 @@ namespace GameCtor.RxNavigation
                 .PopPage(animateLastPage);
         }
 
+        /// <summary>
+        /// Pushes a page onto the modal stack.
+        /// </summary>
+        /// <param name="modal">A page view model.</param>
+        /// <param name="contract">A page contract.</param>
+        /// <returns>An observable that signals the completion of this action.</returns>
         public IObservable<Unit> PushModal(IPageViewModel modal, string contract = null)
         {
             if(modal == null)
@@ -192,6 +240,12 @@ namespace GameCtor.RxNavigation
                     });
         }
 
+        /// <summary>
+        /// Pushes a navigation page onto the modal stack.
+        /// </summary>
+        /// <param name="modal">A page view model.</param>
+        /// <param name="contract">A page contract.</param>
+        /// <returns>An observable that signals the completion of this action.</returns>
         public IObservable<Unit> PushModal(INavigationPageViewModel modal, string contract = null)
         {
             if(modal == null)
@@ -215,6 +269,10 @@ namespace GameCtor.RxNavigation
                     });
         }
 
+        /// <summary>
+        /// Pops a page from the top of the modal stack.
+        /// </summary>
+        /// <returns>An observable that signals the completion of this action.</returns>
         public IObservable<Unit> PopModal()
         {
             return this

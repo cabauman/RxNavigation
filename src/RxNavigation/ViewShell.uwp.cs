@@ -3,7 +3,7 @@ using System.Reactive;
 
 namespace GameCtor.RxNavigation
 {
-    public class MainView : IViewShell
+    public class ViewShell : IViewShell
     {
         public IObservable<IPageViewModel> PagePopped => throw new NotImplementedException();
 
