@@ -14,7 +14,7 @@ using UIKit;
 
 namespace GameCtor.RxNavigation
 {
-    public sealed class MainView : RxNavigationController, IView
+    public sealed class ViewShell : RxNavigationController, IViewShell
     {
         private readonly IScheduler backgroundScheduler;
         private readonly IScheduler mainScheduler;
@@ -26,7 +26,7 @@ namespace GameCtor.RxNavigation
 
         private UINavigationController currentNavigationController;
 
-        public MainView(IScheduler backgroundScheduler, IScheduler mainScheduler, IViewLocator viewLocator)
+        public ViewShell(IScheduler backgroundScheduler, IScheduler mainScheduler, IViewLocator viewLocator)
         {
             this.backgroundScheduler = backgroundScheduler ?? RxApp.TaskpoolScheduler;
             this.mainScheduler = mainScheduler ?? RxApp.MainThreadScheduler;

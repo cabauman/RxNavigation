@@ -6,7 +6,7 @@ namespace GameCtor.RxNavigation
 {
     public interface IViewStackService
     {
-        IView View { get; }
+        IViewShell View { get; }
 
         IObservable<IImmutableList<IPageViewModel>> PageStack { get; }
 

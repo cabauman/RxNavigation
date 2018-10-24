@@ -3,7 +3,7 @@ using System.Reactive;
 
 namespace GameCtor.RxNavigation
 {
-    public interface IView
+    public interface IViewShell
     {
         IObservable<IPageViewModel> PagePopped { get; }
 

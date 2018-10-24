@@ -33,7 +33,7 @@ namespace Sample.Native.iOS
 
             Locator.CurrentMutable.Register(() => new HomeViewController(), typeof(IViewFor<HomeViewModel>));
             
-            IView mainView = new MainView(RxApp.TaskpoolScheduler, RxApp.MainThreadScheduler, ViewLocator.Current);
+            IViewShell mainView = new ViewShell(RxApp.TaskpoolScheduler, RxApp.MainThreadScheduler, ViewLocator.Current);
             IViewStackService viewStackService = new ViewStackService(mainView);
             viewStackService.PushPage(new HomeViewModel(viewStackService)).Subscribe();
             Locator.CurrentMutable.RegisterConstant(viewStackService, typeof(IViewStackService));

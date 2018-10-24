@@ -4,14 +4,12 @@ using System.Collections.Generic;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
-using System.Reflection;
 using Xamarin.Forms;
 
 namespace GameCtor.RxNavigation.XamForms
 {
-    public sealed class MainView : Xamarin.Forms.NavigationPage, IView
+    public sealed class ViewShell : Xamarin.Forms.NavigationPage, IViewShell
     {
         private readonly IScheduler backgroundScheduler;
         private readonly IScheduler mainScheduler;
@@ -22,7 +20,12 @@ namespace GameCtor.RxNavigation.XamForms
 
         private Stack<NavigationPage> navigationPages;
 
-        public MainView(IScheduler backgroundScheduler, IScheduler mainScheduler, IViewLocator viewLocator)
+        public ViewShell()
+            : this(RxApp.TaskpoolScheduler, RxApp.MainThreadScheduler, ViewLocator.Current)
+        {
+        }
+
+        public ViewShell(IScheduler backgroundScheduler, IScheduler mainScheduler, IViewLocator viewLocator)
         {
             this.backgroundScheduler = backgroundScheduler ?? RxApp.TaskpoolScheduler;
             this.mainScheduler = mainScheduler ?? RxApp.MainThreadScheduler;

@@ -1,13 +1,21 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>GameCtor.RxNavigation.XamForms</AssemblyName>
+    <RootNamespace>GameCtor.RxNavigation.XamForms</RootNamespace>
+    <Authors>Colt Alan Bauman</Authors>
+    <PackageProjectUrl>https://github.com/cabauman/RxNavigation</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/cabauman/RxNavigation</RepositoryUrl>
+    <PackageTags>xamarin, ios, android, xamarin.forms, navigation, reactive, rx, reactiveui</PackageTags>
+    <PackageReleaseNotes>Initial release</PackageReleaseNotes>
+    <Description>Custom navigation for Xamarin using Reactive Extensions</Description>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="ReactiveUI" Version="8.7.2" />
-    <PackageReference Include="System.Reactive" Version="4.1.0" />
-    <PackageReference Include="Xamarin.Forms" Version="3.1.0.697729" />
+    <PackageReference Include="System.Reactive" Version="4.0.0" />
+    <PackageReference Include="Xamarin.Forms" Version="3.3.0.912540" />
   </ItemGroup>
 
   <ItemGroup>

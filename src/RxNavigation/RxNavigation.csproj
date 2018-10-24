@@ -3,8 +3,8 @@
   <PropertyGroup>
     <!--Work around so the conditions work below-->
     <TargetFrameworks></TargetFrameworks>
-    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">netstandard2.0;Xamarin.iOS10;MonoAndroid80;uap10.0.16299</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">netstandard2.0;Xamarin.iOS10;MonoAndroid80</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">netstandard2.0;Xamarin.iOS10;MonoAndroid81;uap10.0.16299</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">netstandard2.0;Xamarin.iOS10;MonoAndroid81</TargetFrameworks>
     <!--Feel free to add as many targets as you need below
     netstandard1.0;netstandard2.0;MonoAndroid80;Xamarin.iOS10;uap10.0.16299;Xamarin.TVOS10;Xamarin.WatchOS10;Xamarin.Mac20;Tizen40;netstandard1.0;
     -->
@@ -28,12 +28,10 @@
     <LangVersion>7.1</LangVersion>
     
     <!--TODO: Fill these in-->
-    <PackageLicenseUrl>LINK TO LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/cabauman/RxNavigation</PackageProjectUrl>
-    <RepositoryUrl>LINK TO PROJECT</RepositoryUrl>
+    <RepositoryUrl>https://github.com/cabauman/RxNavigation</RepositoryUrl>
     <PackageReleaseNotes>Initial release</PackageReleaseNotes>
-    <PackageIconUrl>ICON URL</PackageIconUrl>
-    <PackageTags>xamarin, ios, android, xamarin.forms, RxNavigation, reactive</PackageTags>
+    <PackageTags>xamarin, ios, android, xamarin.forms, navigation, reactive, rx, reactiveui</PackageTags>
     
     <Title>RxNavigation Plugin for Xamarin</Title>
     <Summary>Custom navigation for Xamarin using Reactive Extensions</Summary>
@@ -42,7 +40,6 @@
     
     <Owners>Colt Alan Bauman</Owners>
     <Authors>Colt Alan Bauman</Authors>
-    <Copyright>Copyright 2018</Copyright>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)'=='Debug' ">
@@ -57,9 +54,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MSBuild.Sdk.Extras" Version="1.6.47" PrivateAssets="All" />
+    <PackageReference Include="MSBuild.Sdk.Extras" Version="1.6.55" PrivateAssets="All" />
     <PackageReference Include="System.Collections.Immutable" Version="1.5.0" />
-    <PackageReference Include="System.Reactive" Version="4.1.0" />
+    <PackageReference Include="System.Reactive" Version="4.0.0" />
     <PackageReference Include="ReactiveUI" Version="8.7.2" />
     <Compile Include="Shared\**\*.cs" />
   </ItemGroup>
@@ -80,8 +77,8 @@
 
   <ItemGroup Condition=" $(TargetFramework.StartsWith('MonoAndroid')) ">
     <Compile Include="**\*.android.cs" />
-    <PackageReference Include="Xamarin.Android.Support.v4" Version="26.1.0.1" />
-    <PackageReference Include="Xamarin.Android.Support.v7.AppCompat" Version="26.1.0.1" />
+    <PackageReference Include="Xamarin.Android.Support.v4" Version="27.0.2.1" />
+    <PackageReference Include="Xamarin.Android.Support.v7.AppCompat" Version="27.0.2.1" />
     <PackageReference Include="Plugin.CurrentActivity" Version="2.1.0.4" />
   </ItemGroup>
 

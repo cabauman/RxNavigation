@@ -10,16 +10,16 @@ namespace GameCtor.RxNavigation
 {
     public sealed class ViewStackService : IViewStackService, IEnableLogger
     {
-        private readonly IView view;
+        private readonly IViewShell viewShell;
         private readonly BehaviorSubject<IImmutableList<IPageViewModel>> modalPageStack;
         private readonly BehaviorSubject<IImmutableList<IPageViewModel>> defaultNavigationStack;
         private readonly BehaviorSubject<IImmutableList<IPageViewModel>> nullPageStack;
 
         private BehaviorSubject<IImmutableList<IPageViewModel>> currentPageStack;
 
-        public ViewStackService(IView view)
+        public ViewStackService(IViewShell view)
         {
-            this.view = view ?? throw new NullReferenceException("The view can't be null.");
+            this.viewShell = view ?? throw new NullReferenceException("The view can't be null.");
 
             this.modalPageStack = new BehaviorSubject<IImmutableList<IPageViewModel>>(ImmutableList<IPageViewModel>.Empty);
             this.defaultNavigationStack = new BehaviorSubject<IImmutableList<IPageViewModel>>(ImmutableList<IPageViewModel>.Empty);
@@ -50,7 +50,7 @@ namespace GameCtor.RxNavigation
                     .Subscribe(x => this.currentPageStack = x);
 
             this
-                .view
+                .viewShell
                 .PagePopped
                 .Do(
                     _ =>
@@ -61,7 +61,7 @@ namespace GameCtor.RxNavigation
                 .Subscribe();
 
             this
-                .view
+                .viewShell
                 .ModalPopped
                 .Do(
                     _ =>
@@ -72,7 +72,7 @@ namespace GameCtor.RxNavigation
                 .Subscribe();
         }
 
-        public IView View => this.view;
+        public IViewShell View => this.viewShell;
 
         public IObservable<IImmutableList<IPageViewModel>> PageStack => this.currentPageStack;
 
@@ -86,7 +86,7 @@ namespace GameCtor.RxNavigation
             }
 
             return this
-                .view
+                .viewShell
                 .PushPage(page, contract, resetStack, animate)
                 .Do(
                     _ =>
@@ -117,7 +117,7 @@ namespace GameCtor.RxNavigation
 
             stack = stack.Insert(index, page);
             this.currentPageStack.OnNext(stack);
-            this.view.InsertPage(index, page, contract);
+            this.viewShell.InsertPage(index, page, contract);
         }
 
         public IObservable<Unit> PopToPage(int index, bool animateLastPage = true)
@@ -161,7 +161,7 @@ namespace GameCtor.RxNavigation
                 int idxOfSecondToLastPage = stack.Count - 2;
                 for(int i = idxOfSecondToLastPage; i >= stack.Count - count; --i)
                 {
-                    this.view.RemovePage(i);
+                    this.viewShell.RemovePage(i);
                 }
 
                 stack = stack.RemoveRange(stack.Count - count, count - 1);
@@ -170,7 +170,7 @@ namespace GameCtor.RxNavigation
 
             // Now remove the top page with optional animation.
             return this
-                .view
+                .viewShell
                 .PopPage(animateLastPage);
         }
 
@@ -182,7 +182,7 @@ namespace GameCtor.RxNavigation
             }
 
             return this
-                .view
+                .viewShell
                 .PushModal(modal, contract, false)
                 .Do(
                     _ =>
@@ -205,7 +205,7 @@ namespace GameCtor.RxNavigation
             }
 
             return this
-                .view
+                .viewShell
                 .PushModal(modal.PageStack.Value[0], contract, true)
                 .Do(
                     _ =>
@@ -218,7 +218,7 @@ namespace GameCtor.RxNavigation
         public IObservable<Unit> PopModal()
         {
             return this
-                .view
+                .viewShell
                 .PopModal();
         }
 

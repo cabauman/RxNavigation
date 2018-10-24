@@ -21,7 +21,7 @@ namespace Sample
             RegisterServices();
             RegisterViews();
 
-            IView mainView = new MainView(RxApp.TaskpoolScheduler, RxApp.MainThreadScheduler, ViewLocator.Current);
+            IViewShell mainView = new ViewShell(RxApp.TaskpoolScheduler, RxApp.MainThreadScheduler, ViewLocator.Current);
             _navigationPage = mainView as Xamarin.Forms.NavigationPage;
             IViewStackService viewStackService = new ViewStackService(mainView);
             Locator.CurrentMutable.RegisterConstant(viewStackService, typeof(IViewStackService));
