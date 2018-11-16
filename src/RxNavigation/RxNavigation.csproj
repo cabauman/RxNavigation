@@ -54,10 +54,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MSBuild.Sdk.Extras" Version="1.6.55" PrivateAssets="All" />
+    <PackageReference Include="MSBuild.Sdk.Extras" Version="1.6.61" PrivateAssets="All" />
     <PackageReference Include="System.Collections.Immutable" Version="1.5.0" />
-    <PackageReference Include="System.Reactive" Version="4.0.0" />
-    <PackageReference Include="ReactiveUI" Version="8.7.2" />
+    <PackageReference Include="System.Reactive" Version="4.1.2" />
+    <PackageReference Include="ReactiveUI" Version="9.2.2" />
     <Compile Include="Shared\**\*.cs" />
   </ItemGroup>
 
@@ -65,7 +65,7 @@
   </ItemGroup>
 
   <ItemGroup Condition=" $(TargetFramework.StartsWith('uap10.0')) ">
-    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.1.7" />
+    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.2" />
     <Compile Include="**\*.uwp.cs" />
     <!--
     If you need to add sdk references:
