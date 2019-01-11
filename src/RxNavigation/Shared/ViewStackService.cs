@@ -117,6 +117,12 @@ namespace GameCtor.RxNavigation
                     {
                         AddToStackAndTick(this.currentPageStack, page, resetStack);
                         this.Log().Debug("Added page '{0}' (contract '{1}') to stack.", page.Title, contract);
+                        if(resetStack)
+                        {
+                            var stack = this.currentPageStack.Value;
+                            stack = stack.RemoveRange(0, stack.Count - 1);
+                            this.currentPageStack.OnNext(stack);
+                        }
                     });
         }
 

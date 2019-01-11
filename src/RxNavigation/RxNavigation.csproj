@@ -13,10 +13,10 @@
     <PackageId>GameCtor.RxNavigation</PackageId>
     
     <Product>$(AssemblyName) ($(TargetFramework))</Product>
-    <AssemblyVersion>1.0.0</AssemblyVersion>
-    <AssemblyFileVersion>1.0.0</AssemblyFileVersion>
-    <Version>1.0.0</Version>
-    <PackageVersion>1.0.0</PackageVersion>
+    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <AssemblyFileVersion>1.0.1</AssemblyFileVersion>
+    <Version>1.0.1</Version>
+    <PackageVersion>1.0.1</PackageVersion>
     <PackOnBuild>true</PackOnBuild>
     <NeutralLanguage>en</NeutralLanguage>
     <LangVersion>default</LangVersion>
@@ -30,7 +30,7 @@
     <!--TODO: Fill these in-->
     <PackageProjectUrl>https://github.com/cabauman/RxNavigation</PackageProjectUrl>
     <RepositoryUrl>https://github.com/cabauman/RxNavigation</RepositoryUrl>
-    <PackageReleaseNotes>Initial release</PackageReleaseNotes>
+    <PackageReleaseNotes>XF: PushPage with resetStack set to true is now animated (looks much better)</PackageReleaseNotes>
     <PackageTags>xamarin, ios, android, xamarin.forms, navigation, reactive, rx, reactiveui</PackageTags>
     
     <Title>RxNavigation Plugin for Xamarin</Title>

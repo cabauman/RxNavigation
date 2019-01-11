@@ -133,16 +133,19 @@ namespace GameCtor.RxNavigation.XamForms
                             else
                             {
                                 // XF does not allow us to pop to a new root page. Instead, we need to inject the new root page and then pop to it.
-                                this
-                                        .Navigation
-                                        .InsertPageBefore(page, this.Navigation.NavigationStack[0]);
-
-                                return this
-                                    .navigationPages
-                                    .Peek()
-                                    .Navigation
-                                    .PopToRootAsync(animated: false)
-                                    .ToObservable();
+                                var currentNav = navigationPages.Peek().Navigation;
+                                return currentNav
+                                    .PushAsync(page, animate)
+                                    .ToObservable()
+                                    .Do(
+                                        _ =>
+                                        {
+                                            for (int i = currentNav.NavigationStack.Count - 2; i >= 0; --i)
+                                            {
+                                                var p = currentNav.NavigationStack[i];
+                                                currentNav.RemovePage(p);
+                                            }
+                                        });
                             }
                         }
                         else

@@ -8,8 +8,10 @@
     <PackageProjectUrl>https://github.com/cabauman/RxNavigation</PackageProjectUrl>
     <RepositoryUrl>https://github.com/cabauman/RxNavigation</RepositoryUrl>
     <PackageTags>xamarin, ios, android, xamarin.forms, navigation, reactive, rx, reactiveui</PackageTags>
-    <PackageReleaseNotes>Initial release</PackageReleaseNotes>
+    <PackageReleaseNotes>XF: PushPage with resetStack set to true is now animated (looks much better)</PackageReleaseNotes>
     <Description>Custom navigation for Xamarin using Reactive Extensions</Description>
+    <Version>1.0.1</Version>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
