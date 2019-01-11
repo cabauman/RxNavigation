@@ -92,11 +92,11 @@ namespace Sample.Modules
 
         public int PageCount => _pageCount != null ? _pageCount.Value : 0;
 
-        public ReactiveCommand PushPage { get; }
+        public ReactiveCommand<Unit, Unit> PushPage { get; }
 
-        public ReactiveCommand PushModalWithNav { get; }
+        public ReactiveCommand<Unit, Unit> PushModalWithNav { get; }
 
-        public ReactiveCommand PushModalWithoutNav { get; }
+        public ReactiveCommand<Unit, Unit> PushModalWithoutNav { get; }
 
         public ReactiveCommand<Unit, Unit> PopPages { get; set; }
 

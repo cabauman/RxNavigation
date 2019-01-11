@@ -11,11 +11,11 @@ namespace Sample.Modules
 
         int PageCount { get; }
 
-        ReactiveCommand PushPage { get; }
+        ReactiveCommand<Unit, Unit> PushPage { get; }
 
-        ReactiveCommand PushModalWithNav { get; }
+        ReactiveCommand<Unit, Unit> PushModalWithNav { get; }
 
-        ReactiveCommand PushModalWithoutNav { get; }
+        ReactiveCommand<Unit, Unit> PushModalWithoutNav { get; }
 
         ReactiveCommand<Unit, Unit> PopPages { get; }
 
