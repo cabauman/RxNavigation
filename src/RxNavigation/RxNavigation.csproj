@@ -54,10 +54,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MSBuild.Sdk.Extras" Version="1.6.61" PrivateAssets="All" />
+    <PackageReference Include="MSBuild.Sdk.Extras" Version="1.6.65" PrivateAssets="All" />
     <PackageReference Include="System.Collections.Immutable" Version="1.5.0" />
     <PackageReference Include="System.Reactive" Version="4.1.2" />
-    <PackageReference Include="ReactiveUI" Version="9.2.2" />
+    <PackageReference Include="ReactiveUI" Version="9.8.1" />
     <Compile Include="Shared\**\*.cs" />
   </ItemGroup>
 
@@ -77,8 +77,8 @@
 
   <ItemGroup Condition=" $(TargetFramework.StartsWith('MonoAndroid')) ">
     <Compile Include="**\*.android.cs" />
-    <PackageReference Include="Xamarin.Android.Support.v4" Version="27.0.2.1" />
-    <PackageReference Include="Xamarin.Android.Support.v7.AppCompat" Version="27.0.2.1" />
+    <PackageReference Include="Xamarin.Android.Support.v4" Version="28.0.0" />
+    <PackageReference Include="Xamarin.Android.Support.v7.AppCompat" Version="28.0.0" />
     <PackageReference Include="Plugin.CurrentActivity" Version="2.1.0.4" />
   </ItemGroup>
 
