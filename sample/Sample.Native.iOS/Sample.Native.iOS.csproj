@@ -158,7 +158,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="ReactiveUI">
-      <Version>9.2.2</Version>
+      <Version>9.8.1</Version>
     </PackageReference>
     <PackageReference Include="System.Reactive">
       <Version>4.1.2</Version>
