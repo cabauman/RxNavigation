@@ -1,0 +1,39 @@
+<Project>
+  <PropertyGroup Label="Common">
+    <Owners>Colt Alan Bauman</Owners>
+    <Authors>Colt Alan Bauman</Authors>
+	  <Product>RxNavigation ($(TargetFramework))</Product>
+    <RepositoryType>Git</RepositoryType>
+    <PackageProjectUrl>https://github.com/MyUserName/MyProject/</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/MyUserName/MyProject.git/</RepositoryUrl>
+	  <PackageReleaseNotes>XF: PushPage with resetStack set to true is now animated (looks much better)</PackageReleaseNotes>
+    <PackageTags>xamarin, ios, android, xamarin.forms, navigation, reactive, rx, reactiveui</PackageTags>
+	  <IsTestProject>$(MSBuildProjectName.Contains('Tests'))</IsTestProject>
+    <LangVersion>7.2</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)'=='Debug' ">
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)'=='Release' ">
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <DebugType>pdbonly</DebugType>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ReactiveUI" Version="9.8.1" />
+    <PackageReference Include="System.Reactive" Version="4.1.2" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(IsTestProject)' != 'true'">
+    <PackageReference Include="Nerdbank.GitVersioning" Version="2.3.38" PrivateAssets="all" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <SolutionDir Condition="'$(SolutionDir)' == ''">$(MSBuildThisFileDirectory)</SolutionDir>
+  </PropertyGroup>
+  
+</Project>
