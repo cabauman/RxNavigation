@@ -35,6 +35,12 @@ namespace Sample.Modules
                     return ViewStackService.PushModal(new HomeViewModel(ViewStackService));
                 });
 
+            PopModal = ReactiveCommand.CreateFromObservable(
+                () =>
+                {
+                    return ViewStackService.PopModal();
+                });
+
             var canPop = this.WhenAnyValue(
                 vm => vm.PopCount,
                 vm => vm.PageCount,
@@ -101,5 +107,7 @@ namespace Sample.Modules
         public ReactiveCommand<Unit, Unit> PopPages { get; set; }
 
         public ReactiveCommand<Unit, Unit> PopToNewPage { get; set; }
+
+        public ReactiveCommand<Unit, Unit> PopModal { get; }
     }
 }

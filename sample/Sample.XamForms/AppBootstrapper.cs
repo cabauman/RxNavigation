@@ -44,7 +44,7 @@ namespace Sample
         private void RegisterViews()
         {
             Locator.CurrentMutable.Register(() => new LoginPage(), typeof(IViewFor<ILoginViewModel>));
-            Locator.CurrentMutable.Register(() => new HomePage(), typeof(IViewFor<HomeViewModel>));
+            Locator.CurrentMutable.Register(() => new HomePage(), typeof(IViewFor<IHomeViewModel>));
         }
     }
 }

@@ -2,8 +2,8 @@
 using System;
 using System.Reactive;
 using System.Reactive.Linq;
-using Sample.Common;
 using GameCtor.RxNavigation;
+using Sample.Common;
 
 namespace Sample.Modules
 {
