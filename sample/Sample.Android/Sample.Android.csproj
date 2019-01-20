@@ -52,7 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="ReactiveUI">
-      <Version>9.8.1</Version>
+      <Version>9.8.15</Version>
     </PackageReference>
     <PackageReference Include="System.Reactive">
       <Version>4.1.2</Version>
@@ -103,9 +103,9 @@
     <Folder Include="Resources\drawable\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Sample\Sample.csproj">
+    <ProjectReference Include="..\Sample.XamForms\Sample.XamForms.csproj">
       <Project>{02BE01DA-EFDD-4546-9C6C-2D49CE8F14F8}</Project>
-      <Name>Sample</Name>
+      <Name>Sample.XamForms</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />

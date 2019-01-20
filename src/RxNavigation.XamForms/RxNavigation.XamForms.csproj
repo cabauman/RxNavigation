@@ -15,4 +15,8 @@
     <ProjectReference Include="..\RxNavigation\RxNavigation.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Update="ReactiveUI" Version="9.8.15" />
+  </ItemGroup>
+
 </Project>
