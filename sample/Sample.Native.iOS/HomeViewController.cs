@@ -7,6 +7,7 @@ using UIKit;
 using Foundation;
 using ReactiveUI;
 using CoreGraphics;
+using Sample.Modules;
 
 namespace Sample.Native.iOS
 {
@@ -81,7 +82,7 @@ namespace Sample.Native.iOS
     }
 
     [Register("HomeViewController")]
-    public class HomeViewController : ReactiveViewController<HomeViewModel>
+    public class HomeViewController : ReactiveViewController<IHomeViewModel>
     {
         private UniversalView _view;
 
