@@ -1,25 +1,30 @@
 <Project>
   <PropertyGroup Label="Common">
+    <Product>RxNavigation ($(TargetFramework))</Product>
+    <Description>Custom navigation for Xamarin using Reactive Extensions</Description>
+    <DefaultLanguage>en-US</DefaultLanguage>
     <Owners>Colt Alan Bauman</Owners>
     <Authors>Colt Alan Bauman</Authors>
-	  <Product>RxNavigation ($(TargetFramework))</Product>
-    <RepositoryType>Git</RepositoryType>
-    <PackageProjectUrl>https://github.com/MyUserName/MyProject/</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/MyUserName/MyProject.git/</RepositoryUrl>
-	  <PackageReleaseNotes>XF: PushPage with resetStack set to true is now animated (looks much better)</PackageReleaseNotes>
+    <Copyright>Copyright © ([System.DateTime]::Now.Year) Colt Alan Bauman</Copyright>
+    <PackageProjectUrl>https://github.com/cabauman/RxNavigation</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/cabauman/RxNavigation</RepositoryUrl>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <RepositoryType>git</RepositoryType>
+	  <PackageReleaseNotes>https://github.com/cabauman/RxNavigation/releases</PackageReleaseNotes>
     <PackageTags>xamarin, ios, android, xamarin.forms, navigation, reactive, rx, reactiveui</PackageTags>
-	  <IsTestProject>$(MSBuildProjectName.Contains('Tests'))</IsTestProject>
-    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)'=='Debug' ">
-    <DebugType>full</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-    <GenerateDocumentationFile>false</GenerateDocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)'=='Release' ">
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <DebugType>pdbonly</DebugType>
+  <!-- CI Helpers -->
+  <PropertyGroup>
+    <IsDebugBuild>$(Configuration.Equals('Debug'))</IsDebugBuild>
+    <IsTestProject>$(MSBuildProjectName.Contains('Tests'))</IsTestProject>
+    <IsBenchmarkProject>$(MSBuildProjectName.Contains('Benchmarks'))</IsBenchmarkProject>
+    <PackageOutputPath>$(MSBuildThisFileDirectory)nupkgs</PackageOutputPath>
+    <IsPackable>true</IsPackable>
+    <IsPackable Condition="$(IsTestProject)">false</IsPackable>
+    <IsPackable Condition="$(IsBenchmarkProject)">false</IsPackable>
+    <IsPackable Condition="$(IsDebugBuild)">false</IsPackable>
+    <GeneratePackageOnBuild>$(IsPackable)</GeneratePackageOnBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
@@ -28,12 +33,11 @@
     <PackageReference Include="System.Reactive" Version="4.1.2" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(IsTestProject)' != 'true'">
+  <ItemGroup Condition="!'$(IsTestProject)' and !'$(IsBenchmarkProject)'">
     <PackageReference Include="Nerdbank.GitVersioning" Version="2.3.38" PrivateAssets="all" />
   </ItemGroup>
 
   <PropertyGroup>
     <SolutionDir Condition="'$(SolutionDir)' == ''">$(MSBuildThisFileDirectory)</SolutionDir>
   </PropertyGroup>
-  
 </Project>

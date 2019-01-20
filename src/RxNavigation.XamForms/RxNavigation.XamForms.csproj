@@ -2,7 +2,8 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <Description>Custom navigation for Xamarin using Reactive Extensions</Description>
+    <AssemblyName>RxNavigation.XamForms</AssemblyName>
+    <RootNamespace>GameCtor.RxNavigation.XamForms</RootNamespace>
     <PackageId>GameCtor.RxNavigation.XamForms</PackageId>
   </PropertyGroup>
 

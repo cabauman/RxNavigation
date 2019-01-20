@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="MSBuild.Sdk.Extras">
 
   <PropertyGroup>
     <!--Work around so the conditions work below-->
@@ -8,15 +8,13 @@
     <!--Feel free to add as many targets as you need below
     netstandard1.0;netstandard2.0;MonoAndroid80;Xamarin.iOS10;uap10.0.16299;Xamarin.TVOS10;Xamarin.WatchOS10;Xamarin.Mac20;Tizen40;netstandard1.0;
     -->
-    <AssemblyName>GameCtor.RxNavigation</AssemblyName>
+    <AssemblyName>RxNavigation</AssemblyName>
     <RootNamespace>GameCtor.RxNavigation</RootNamespace>
-    <Description>Custom navigation for Xamarin using Reactive Extensions</Description>
     <PackageId>GameCtor.RxNavigation</PackageId>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MSBuild.Sdk.Extras" Version="1.6.65" PrivateAssets="All" />
     <PackageReference Include="System.Collections.Immutable" Version="1.5.0" />
     <Compile Include="Shared\**\*.cs" />
   </ItemGroup>
@@ -39,6 +37,4 @@
   <ItemGroup Condition=" $(TargetFramework.StartsWith('Xamarin.iOS')) ">
     <Compile Include="**\*.apple.cs" />
   </ItemGroup>
-
-  <Import Project="$(MSBuildSDKExtrasTargets)" Condition="Exists('$(MSBuildSDKExtrasTargets)')" />
 </Project>
