@@ -5,7 +5,7 @@ using System.Reactive;
 namespace GameCtor.RxNavigation
 {
     /// <summary>
-    /// Interface that manages a stack of views.
+    /// Interface that manages a stack of view models.
     /// </summary>
     public interface IViewStackService
     {
