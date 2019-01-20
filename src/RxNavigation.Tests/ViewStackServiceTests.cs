@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using FluentAssertions;
 using GameCtor.RxNavigation;
 using NSubstitute;
@@ -8,60 +10,75 @@ using Xunit;
 
 namespace RxNavigation.Tests
 {
-    public class ViewStackServiceTests
+    public class ViewStackServiceTests : IDisposable
     {
         private IViewShell _viewShell;
-        private IPageViewModel _pageViewModel;
-        private IViewStackService _sut;
+        private IPageViewModel _page;
+        private Subject<IPageViewModel> _pagePopped;
+        private Subject<Unit> _modalPopped;
 
         public ViewStackServiceTests()
         {
-            //_viewShell = Substitute.For<IViewShell>();
-            //_pageViewModel = Substitute.For<IPageViewModel>();
-            //_sut = new ViewStackService(_viewShell);
+            _viewShell = Substitute.For<IViewShell>();
+            _page = Substitute.For<IPageViewModel>();
+            _pagePopped = new Subject<IPageViewModel>();
+            _modalPopped = new Subject<Unit>();
+            _viewShell.PagePopped.Returns(_pagePopped);
+            _viewShell.ModalPopped.Returns(_modalPopped);
+
+            _viewShell
+                .When(x => x.PopPage(Arg.Any<bool>()))
+                .Do(_ => _pagePopped.OnNext(_page));
+
+            _viewShell
+                .When(x => x.PopModal())
+                .Do(_ => _modalPopped.OnNext(Unit.Default));
+        }
+
+        public void Dispose()
+        {
+            _pagePopped.Dispose();
+            _modalPopped.Dispose();
+        }
+
+        [Fact]
+        public void Should_AddViewModelToPageStack_When_Pushed()
+        {
+            // Arrange
+            var sut = new ViewStackService(_viewShell);
+
+            // Act
+            sut.PushPage(_page).Subscribe();
+
+            // Assert
+            sut.PageStack.FirstAsync().Wait().Count.Should().Be(1);
         }
 
         [Theory]
         [InlineData(null, false, true)]
         [InlineData(null, true, true)]
-        [InlineData(null, true, false)]
-        [InlineData(null, false, false)]
-        public void Should_AddViewModelToPageStack_When_Pushed(string contract, bool resetStack, bool animate)
+        [InlineData("SomeContract", true, false)]
+        [InlineData("SomeContract", false, false)]
+        public void Should_InvokeViewShellPushPage_When_PushPageIsInvoked(string contract, bool resetStack, bool animate)
         {
             // Arrange
+            var sut = new ViewStackService(_viewShell);
 
             // Act
-            _sut.PushPage(_pageViewModel, contract, resetStack, animate).Subscribe();
+            sut.PushPage(_page, contract, resetStack, animate).Subscribe();
 
             // Assert
-            _sut.PageStack.FirstAsync().Wait().Count.Should().Be(1);
-        }
-
-        [Fact]
-        public void Should_InvokeViewShellPushPage_When_PushPageIsInvoked()
-        {
-            // Arrange
-            var viewShell = Substitute.For<IViewShell>();
-            var viewModel = Substitute.For<IPageViewModel>();
-            var sut = new ViewStackService(viewShell);
-
-            // Act
-            sut.PushPage(viewModel).Subscribe();
-
-            // Assert
-            viewShell.Received(1).PushPage(viewModel, null, false, true);
+            _viewShell.Received(1).PushPage(_page, contract, resetStack, animate);
         }
 
         [Fact]
         public void Should_AddViewModelToModalStack_When_Pushed()
         {
             // Arrange
-            var viewShell = Substitute.For<IViewShell>();
-            var viewModel = Substitute.For<IPageViewModel>();
-            var sut = new ViewStackService(viewShell);
+            var sut = new ViewStackService(_viewShell);
 
             // Act
-            sut.PushModal(viewModel).Subscribe();
+            sut.PushModal(_page).Subscribe();
 
             // Assert
             sut.ModalStack.FirstAsync().Wait().Count.Should().Be(1);
@@ -71,58 +88,55 @@ namespace RxNavigation.Tests
         public void Should_InvokeViewShellPushModal_When_PushModalIsInvoked()
         {
             // Arrange
-            var viewShell = Substitute.For<IViewShell>();
-            var viewModel = Substitute.For<IPageViewModel>();
-            var sut = new ViewStackService(viewShell);
+            var sut = new ViewStackService(_viewShell);
 
             // Act
-            sut.PushModal(viewModel).Subscribe();
+            sut.PushModal(_page).Subscribe();
 
             // Assert
-            viewShell.Received(1).PushModal(viewModel, null, false);
+            _viewShell.Received(1).PushModal(_page, null, false);
         }
 
         [Fact]
-        public void Should_EmitViewShellPoppedSignal_When_PageIsPopped()
+        public void Should_InvokeViewShellInsertPageTwice_When_InitializingViewStackServiceWithTwoPages()
         {
             // Arrange
-            var viewShell = Substitute.For<IViewShell>();
-            var viewModel = Substitute.For<IPageViewModel>();
-            var popped = false;
-            var sut = new ViewStackService(viewShell);
-
-            sut.PushPage(viewModel).Subscribe();
-            sut.PushPage(viewModel).Subscribe();
-            viewShell.PagePopped.Returns(Observable.Return<IPageViewModel>(viewModel));
-            viewShell.PagePopped.Subscribe(
-                _ =>
-                {
-                    popped = true;
-                });
 
             // Act
-            //sut.PopPages().Subscribe();
+            var sut = new ViewStackService(_viewShell, new[] { _page, _page });
 
             // Assert
-            popped.Should().Be(true);
+            _viewShell.Received(2).InsertPage(Arg.Any<int>(), _page, string.Empty);
         }
 
         [Fact]
         public void Should_InvokeViewShellPopPage_When_PageIsPopped()
         {
             // Arrange
-            var viewShell = Substitute.For<IViewShell>();
-            var viewModel = Substitute.For<IPageViewModel>();
-            var sut = new ViewStackService(viewShell);
-
-            sut.PushPage(viewModel).Subscribe();
-            sut.PushPage(viewModel).Subscribe();
+            var sut = new ViewStackService(_viewShell, new[] { _page, _page });
 
             // Act
             sut.PopPages().Subscribe();
 
             // Assert
-            viewShell.Received(1).PopPage(true);
+            _viewShell.Received(1).PopPage(true);
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(2)]
+        public void Should_HavePageIndexPlusOnePagesRemaining_When_PopToPageIsInvoked(int pageIndex)
+        {
+            // Arrange
+            var sut = new ViewStackService(_viewShell, new[] { _page, _page, _page, _page });
+
+            // Act
+            sut.PopToPage(pageIndex).Subscribe();
+
+            // Assert
+            int numPages = pageIndex + 1;
+            sut.PageStack.FirstAsync().Wait().Count.Should().Be(numPages);
         }
     }
 }

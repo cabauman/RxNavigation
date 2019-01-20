@@ -3,10 +3,11 @@ using System;
 using System.Reactive;
 using System.Reactive.Linq;
 using GameCtor.RxNavigation;
+using Sample.Common;
 
-namespace Sample.Native.iOS
+namespace Sample.Modules
 {
-    public class LoginViewModel : BaseViewModel, IPageViewModel
+    public class LoginViewModel : BaseViewModel, ILoginViewModel, IPageViewModel
     {
         private string _email;
         private string _password;
@@ -47,7 +48,7 @@ namespace Sample.Native.iOS
                 canCancel);
         }
 
-        public string Title => nameof(LoginViewModel);
+        public string Title => "Login";
 
         public string Email
         {

@@ -20,5 +20,7 @@ namespace Sample.Modules
         ReactiveCommand<Unit, Unit> PopPages { get; }
 
         ReactiveCommand<Unit, Unit> PopToNewPage { get; }
+
+        ReactiveCommand<Unit, Unit> PopModal { get; }
     }
 }

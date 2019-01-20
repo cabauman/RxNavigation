@@ -180,7 +180,7 @@ namespace GameCtor.RxNavigation.XamForms
         /// Inserts a page into the current page stack at the given index.
         /// </summary>
         /// <param name="index">An insertion index.</param>
-        /// <param name="page">A page view model.</param>
+        /// <param name="pageViewModel">A page view model.</param>
         /// <param name="contract">A page contract.</param>
         public void InsertPage(int index, IPageViewModel pageViewModel, string contract = null)
         {

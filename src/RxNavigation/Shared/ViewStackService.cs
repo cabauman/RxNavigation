@@ -1,7 +1,9 @@
 ﻿using ReactiveUI;
 using Splat;
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -24,23 +26,30 @@ namespace GameCtor.RxNavigation
         /// Creates an instance of ViewStackService.
         /// </summary>
         /// <param name="viewShell">The view shell (platform specific).</param>
-        public ViewStackService(IViewShell viewShell)
+        /// <param name="pages">A list of pages to initialize the page stack with.</param>
+        public ViewStackService(IViewShell viewShell, IList<IPageViewModel> pages = null)
         {
             this.viewShell = viewShell ?? throw new NullReferenceException("The viewShell can't be null.");
 
-            this.modalPageStack = new BehaviorSubject<IImmutableList<IPageViewModel>>(ImmutableList<IPageViewModel>.Empty);
-            this.defaultNavigationStack = new BehaviorSubject<IImmutableList<IPageViewModel>>(ImmutableList<IPageViewModel>.Empty);
-            this.nullPageStack = new BehaviorSubject<IImmutableList<IPageViewModel>>(null);
             this.currentPageStack = new BehaviorSubject<IImmutableList<IPageViewModel>>(ImmutableList<IPageViewModel>.Empty);
+            this.modalPageStack = new BehaviorSubject<IImmutableList<IPageViewModel>>(ImmutableList<IPageViewModel>.Empty);
+            this.nullPageStack = new BehaviorSubject<IImmutableList<IPageViewModel>>(null);
+
+            var immutablePages = pages != null ? pages.ToImmutableList() : ImmutableList<IPageViewModel>.Empty;
+            this.defaultNavigationStack = new BehaviorSubject<IImmutableList<IPageViewModel>>(immutablePages);
+            for (int i = 0; i < immutablePages.Count; ++i)
+            {
+                ViewShell.InsertPage(i, pages[i], null);
+            }
 
             this
                 .modalPageStack
                     .Select(
                         x =>
                         {
-                            if(x.Count > 0)
+                            if (x.Count > 0)
                             {
-                                if(x[x.Count - 1] is INavigationPageViewModel navigationPage)
+                                if (x[x.Count - 1] is INavigationPageViewModel navigationPage)
                                 {
                                     return navigationPage.PageStack;
                                 }

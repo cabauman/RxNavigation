@@ -1,28 +1,16 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ReactiveUI" Version="9.8.1" />
-    <PackageReference Include="ReactiveUI.XamForms" Version="9.8.1" />
-    <PackageReference Include="System.Collections.Immutable" Version="1.5.0" />
+    <PackageReference Include="ReactiveUI" Version="9.8.15" />
     <PackageReference Include="System.Reactive" Version="4.1.2" />
-    <PackageReference Include="Xamarin.Forms" Version="3.4.0.1009999" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\RxNavigation.XamForms\RxNavigation.XamForms.csproj" />
     <ProjectReference Include="..\..\src\RxNavigation\RxNavigation.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Modules\Home\HomePage.xaml.cs">
-      <DependentUpon>HomePage.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Modules\Login\LoginPage.xaml.cs">
-      <DependentUpon>LoginPage.xaml</DependentUpon>
-    </Compile>
-  </ItemGroup>
 </Project>

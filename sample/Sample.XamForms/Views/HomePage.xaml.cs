@@ -1,6 +1,5 @@
 ﻿using ReactiveUI;
 using System.Reactive.Disposables;
-using Xamarin.Forms;
 using Sample.Common;
 
 namespace Sample.Modules
@@ -24,13 +23,13 @@ namespace Sample.Modules
                         .BindCommand(ViewModel, vm => vm.PushModalWithoutNav, v => v.PushModalWithoutNavButton)
                         .DisposeWith(disposables);
                     this
-                        .Bind(ViewModel, vm => vm.PopCount, v => v.PopCountEntry.Text)
+                        .Bind(ViewModel, vm => vm.PopCount, v => v.PopCountEntry.Text, viewToVmConverter: x => string.IsNullOrWhiteSpace(x) ? 0 : int.Parse(x), vmToViewConverter: x => x?.ToString())
                         .DisposeWith(disposables);
                     this
                         .BindCommand(ViewModel, vm => vm.PopPages, v => v.PopPagesButton)
                         .DisposeWith(disposables);
                     this
-                        .Bind(ViewModel, vm => vm.PageIndex, v => v.PageIndexEntry.Text)
+                        .Bind(ViewModel, vm => vm.PageIndex, v => v.PageIndexEntry.Text, viewToVmConverter: x => string.IsNullOrWhiteSpace(x) ? 0 : int.Parse(x), vmToViewConverter: x => x?.ToString())
                         .DisposeWith(disposables);
                     this
                         .BindCommand(ViewModel, vm => vm.PopToNewPage, v => v.PopToNewPageButton)

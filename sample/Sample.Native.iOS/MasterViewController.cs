@@ -5,6 +5,7 @@ using UIKit;
 using Foundation;
 using Splat;
 using GameCtor.RxNavigation;
+using Sample.Modules;
 
 namespace Sample.Native.iOS
 {
