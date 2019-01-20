@@ -51,7 +51,6 @@
   </Choose>
   <ItemGroup>
     <Compile Include="ViewStackServiceTests.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FluentAssertions">
@@ -80,6 +79,9 @@
       <Project>{C943E84E-7734-45D8-9577-9AC52BF191AA}</Project>
       <Name>RxNavigation</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
