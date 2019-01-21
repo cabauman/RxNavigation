@@ -12,15 +12,15 @@ namespace GameCtor.RxNavigation
 {
     public class ViewShell : FragmentActivity, IViewShell
     {
-        private readonly IScheduler backgroundScheduler;
-        private readonly IScheduler mainScheduler;
-        private readonly IViewLocator viewLocator;
+        private readonly IScheduler _backgroundScheduler;
+        private readonly IScheduler _mainScheduler;
+        private readonly IViewLocator _viewLocator;
 
         public ViewShell(IScheduler backgroundScheduler, IScheduler mainScheduler, IViewLocator viewLocator)
         {
-            this.backgroundScheduler = backgroundScheduler ?? RxApp.TaskpoolScheduler;
-            this.mainScheduler = mainScheduler ?? RxApp.MainThreadScheduler;
-            this.viewLocator = viewLocator ?? ViewLocator.Current;
+            _backgroundScheduler = backgroundScheduler ?? RxApp.TaskpoolScheduler;
+            _mainScheduler = mainScheduler ?? RxApp.MainThreadScheduler;
+            _viewLocator = viewLocator ?? ViewLocator.Current;
 
             //this.navigationPages = new Stack<UINavigationController>();
             //this.navigationPages.Push(this);
@@ -68,30 +68,56 @@ namespace GameCtor.RxNavigation
                 .Start(
                     () =>
                     {
-                        MyFragment frag = new MyFragment();
+                        var page = LocatePageFor(pageViewModel, contract);
+                        return page;
+                    },
+                    _backgroundScheduler)
+                .ObserveOn(_mainScheduler)
+                .SelectMany(
+                    page =>
+                    {
                         SupportFragmentManager
                             .BeginTransaction()
-                            .Add(Android.Resource.Id.Content, frag)
+                            .Add(Android.Resource.Id.Content, page)
                             .AddToBackStack("name")
                             .Commit();
 
-                        return frag.WhenPushed;
-                    })
-                .Switch();
+                        return page.WhenPushed;
+                    });
         }
 
         public void RemovePage(int index)
         {
             throw new NotImplementedException();
         }
+
+        private MyFragment LocatePageFor(object viewModel, string contract)
+        {
+            var viewFor = _viewLocator.ResolveView(viewModel, contract);
+            var page = viewFor as MyFragment;
+
+            if (viewFor == null)
+            {
+                throw new InvalidOperationException($"No view could be located for type '{viewModel.GetType().FullName}', contract '{contract}'. Be sure Splat has an appropriate registration.");
+            }
+
+            if (page == null)
+            {
+                throw new InvalidOperationException($"Resolved view '{viewFor.GetType().FullName}' for type '{viewModel.GetType().FullName}', contract '{contract}' is not a Page.");
+            }
+
+            viewFor.ViewModel = viewModel;
+
+            return page;
+        }
     }
 
 
     public class MyFragment : Fragment, Animation.IAnimationListener
     {
-        private Subject<Unit> whenPushed;
-        private Subject<Unit> whenPopped;
-        private IObservable<Unit> WhenComplete;
+        private Subject<Unit> _whenPushed;
+        private Subject<Unit> _whenPopped;
+        private IObservable<Unit> _WhenComplete;
 
         public MyFragment()
         {
@@ -99,13 +125,13 @@ namespace GameCtor.RxNavigation
         
         public IObservable<Unit> WhenPushed
         {
-            get { return whenPushed.AsObservable(); }
+            get { return _whenPushed.AsObservable(); }
         }
 
         public void OnAnimationEnd(Animation animation)
         {
-            whenPushed.OnNext(Unit.Default);
-            whenPushed.OnCompleted();
+            _whenPushed.OnNext(Unit.Default);
+            _whenPushed.OnCompleted();
         }
 
         public void OnAnimationRepeat(Animation animation)
@@ -123,12 +149,12 @@ namespace GameCtor.RxNavigation
             Animation anim = base.OnCreateAnimation(transit, enter, nextAnim);
             //Animation anim = AnimationUtils.LoadAnimation(Activity, nextAnim);
 
-            if(anim == null && nextAnim != 0)
+            if (anim == null && nextAnim != 0)
             {
                 anim = AnimationUtils.LoadAnimation(Activity, nextAnim);
             }
 
-            WhenComplete = Observable.FromEventPattern<Animation.AnimationEndEventArgs>(
+            _WhenComplete = Observable.FromEventPattern<Animation.AnimationEndEventArgs>(
                 h => anim.AnimationEnd += h,
                 h => anim.AnimationEnd -= h)
                     .Select(_ => Unit.Default)

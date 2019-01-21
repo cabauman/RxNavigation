@@ -15,7 +15,7 @@ namespace GameCtor.RxNavigation
         public NavigationPageViewModel(IPageViewModel page = null)
         {
             var contents = page != null ? ImmutableList.Create(page) : ImmutableList<IPageViewModel>.Empty;
-            this.PageStack = new BehaviorSubject<IImmutableList<IPageViewModel>>(contents);
+            PageStack = new BehaviorSubject<IImmutableList<IPageViewModel>>(contents);
         }
 
         /// <summary>

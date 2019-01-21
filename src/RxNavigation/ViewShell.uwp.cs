@@ -13,18 +13,18 @@ namespace GameCtor.RxNavigation
 {
     public class ViewShell : TransitioningContentControl, IViewShell, IActivatable, IEnableLogger
     {
-        private readonly Frame frame;
-        private readonly IScheduler backgroundScheduler;
-        private readonly IScheduler mainScheduler;
-        private readonly ViewTypeLocator viewTypeLocator;
-        private readonly Subject<IPageViewModel> pagePopped;
+        private readonly Frame _frame;
+        private readonly IScheduler _backgroundScheduler;
+        private readonly IScheduler _mainScheduler;
+        private readonly ViewTypeLocator _viewTypeLocator;
+        private readonly Subject<IPageViewModel> _pagePopped;
 
         public ViewShell(Frame frame, IScheduler backgroundScheduler, IScheduler mainScheduler, ViewTypeLocator viewTypeLocator)
         {
-            this.frame = frame;
-            this.backgroundScheduler = backgroundScheduler ?? RxApp.TaskpoolScheduler;
-            this.mainScheduler = mainScheduler ?? RxApp.MainThreadScheduler;
-            this.viewTypeLocator = viewTypeLocator ?? new ViewTypeLocator();
+            _frame = frame;
+            _backgroundScheduler = backgroundScheduler ?? RxApp.TaskpoolScheduler;
+            _mainScheduler = mainScheduler ?? RxApp.MainThreadScheduler;
+            _viewTypeLocator = viewTypeLocator ?? new ViewTypeLocator();
 
             HorizontalContentAlignment = HorizontalAlignment.Stretch;
             VerticalContentAlignment = VerticalAlignment.Stretch;
@@ -40,7 +40,7 @@ namespace GameCtor.RxNavigation
                         });
         }
 
-        public IObservable<IPageViewModel> PagePopped => pagePopped.AsObservable();
+        public IObservable<IPageViewModel> PagePopped => _pagePopped.AsObservable();
 
         public IObservable<Unit> ModalPopped => throw new NotImplementedException();
 
@@ -57,8 +57,8 @@ namespace GameCtor.RxNavigation
         public IObservable<Unit> PopPage(bool animate)
         {
             return Observable
-                .Start(() => this.frame.GoBack())
-                .Do(_ => pagePopped.OnNext(null));
+                .Start(() => _frame.GoBack())
+                .Do(_ => _pagePopped.OnNext(null));
         }
 
         public IObservable<Unit> PushModal(IPageViewModel modalViewModel, string contract, bool withNavStack)
@@ -69,7 +69,7 @@ namespace GameCtor.RxNavigation
         public IObservable<Unit> PushPage(IPageViewModel pageViewModel, string contract, bool resetStack, bool animate)
         {
             return Observable
-                .Start(() => this.frame.Navigate(LocatePageFor(pageViewModel, contract), pageViewModel))
+                .Start(() => _frame.Navigate(LocatePageFor(pageViewModel, contract), pageViewModel))
                 .Select(_ => Unit.Default);
         }
 
@@ -80,7 +80,7 @@ namespace GameCtor.RxNavigation
 
         private Type LocatePageFor(object viewModel, string contract)
         {
-            var viewType = this.viewTypeLocator.ResolveView(viewModel, contract);
+            var viewType = _viewTypeLocator.ResolveView(viewModel, contract);
 
             if (viewType == null)
             {

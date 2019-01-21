@@ -7,7 +7,7 @@ namespace GameCtor.RxNavigation
 {
     public class RxNavigationController : UINavigationController
     {
-        private readonly Subject<UIViewController> controllerPopped = new Subject<UIViewController>();
+        private readonly Subject<UIViewController> _controllerPopped = new Subject<UIViewController>();
 
         public static int incrementer = 0;
         public int index;
@@ -23,12 +23,12 @@ namespace GameCtor.RxNavigation
             index = incrementer++;
         }
 
-        public IObservable<UIViewController> ControllerPopped => this.controllerPopped.AsObservable();
+        public IObservable<UIViewController> ControllerPopped => _controllerPopped.AsObservable();
 
         public override UIViewController PopViewController(bool animated)
         {
             var poppedController = base.PopViewController(animated);
-            this.controllerPopped.OnNext(poppedController);
+            _controllerPopped.OnNext(poppedController);
 
             return poppedController;
         }

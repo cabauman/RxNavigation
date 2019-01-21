@@ -14,27 +14,27 @@ namespace GameCtor.RxNavigation
 {
     public class MainActivityView : IViewShell
     {
-        private readonly IScheduler backgroundScheduler;
-        private readonly IScheduler mainScheduler;
-        private readonly IViewLocator viewLocator;
-        private readonly IObservable<IPageViewModel> pagePopped;
-        private IObservable<Activity> whenPageCreated;
-        private readonly HashSet<Activity> userInstigatedPops;
+        private readonly IScheduler _backgroundScheduler;
+        private readonly IScheduler _mainScheduler;
+        private readonly IViewLocator _viewLocator;
+        private readonly IObservable<IPageViewModel> _pagePopped;
+        private IObservable<Activity> _whenPageCreated;
+        private readonly HashSet<Activity> _userInstigatedPops;
 
         public MainActivityView(IScheduler backgroundScheduler, IScheduler mainScheduler, IViewLocator viewLocator)
         {
-            this.backgroundScheduler = backgroundScheduler ?? RxApp.TaskpoolScheduler;
-            this.mainScheduler = mainScheduler ?? RxApp.MainThreadScheduler;
-            this.viewLocator = viewLocator ?? ViewLocator.Current;
+            _backgroundScheduler = backgroundScheduler ?? RxApp.TaskpoolScheduler;
+            _mainScheduler = mainScheduler ?? RxApp.MainThreadScheduler;
+            _viewLocator = viewLocator ?? ViewLocator.Current;
 
-            whenPageCreated = Observable
+            _whenPageCreated = Observable
                 .FromEventPattern<ActivityEventArgs>(
                     h => CrossCurrentActivity.Current.ActivityStateChanged += h,
                     h => CrossCurrentActivity.Current.ActivityStateChanged -= h)
                 .Where(x => x.EventArgs.Event == ActivityEvent.Created)
                 .Select(x => x.EventArgs.Activity);
 
-            this.pagePopped = Observable
+            _pagePopped = Observable
                 .FromEventPattern<ActivityEventArgs>(
                     h => CrossCurrentActivity.Current.ActivityStateChanged += h,
                     h => CrossCurrentActivity.Current.ActivityStateChanged -= h)
@@ -43,7 +43,7 @@ namespace GameCtor.RxNavigation
                 .Select(
                     x =>
                     {
-                        bool removed = userInstigatedPops.Remove(x);
+                        bool removed = _userInstigatedPops.Remove(x);
                         return removed ? null : x;
                     })
                 .Where(x => x != null)
@@ -52,7 +52,7 @@ namespace GameCtor.RxNavigation
                 .Select(x => x.ViewModel as IPageViewModel);
         }
 
-        public IObservable<IPageViewModel> PagePopped => this.PagePopped;
+        public IObservable<IPageViewModel> PagePopped => PagePopped;
 
         public IObservable<Unit> ModalPopped => throw new NotImplementedException();
 
@@ -72,7 +72,7 @@ namespace GameCtor.RxNavigation
                 .Start(
                     () =>
                     {
-                        userInstigatedPops.Add(CrossCurrentActivity.Current.Activity);
+                        _userInstigatedPops.Add(CrossCurrentActivity.Current.Activity);
                         CrossCurrentActivity.Current.Activity.Finish();
                     });
         }
@@ -98,7 +98,7 @@ namespace GameCtor.RxNavigation
                 .Delay(
                     _ =>
                     {
-                        return whenPageCreated
+                        return _whenPageCreated
                             .Where(x => x.Intent.GetIntExtra("Id", -1) == id)
                             .Select(x => x as IViewFor)
                             .Where(x => x != null)
