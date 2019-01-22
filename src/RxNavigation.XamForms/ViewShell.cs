@@ -80,24 +80,13 @@ namespace GameCtor.RxNavigation.XamForms
                 .Select(x => Unit.Default);
         }
 
-        /// <summary>
-        /// Gets an observable that signals when a page is popped from the current page stack.
-        /// </summary>
+        /// <inheritdoc/>
         public IObservable<IPageViewModel> PagePopped => _pagePopped;
 
-        /// <summary>
-        /// Gets an observable that signals when a page is popped from the modal stack.
-        /// </summary>
+        /// <inheritdoc/>
         public IObservable<Unit> ModalPopped => _modalPopped;
 
-        /// <summary>
-        /// Pushes a page onto the current page stack.
-        /// </summary>
-        /// <param name="pageViewModel">A page view model.</param>
-        /// <param name="contract">A page contract.</param>
-        /// <param name="resetStack">A flag signalling if the page stack should be reset.</param>
-        /// <param name="animate">A flag signalling if the push should be animated.</param>
-        /// <returns>An observable that signals the completion of this action.</returns>
+        /// <inheritdoc/>
         public IObservable<Unit> PushPage(IPageViewModel pageViewModel, string contract, bool resetStack, bool animate)
         {
             // If we don't have a root page yet, be sure we create one and assign one immediately because otherwise we'll get an exception.
@@ -158,11 +147,7 @@ namespace GameCtor.RxNavigation.XamForms
                     });
         }
 
-        /// <summary>
-        /// Pops a page from the top of the current page stack.
-        /// </summary>
-        /// <param name="animate"></param>
-        /// <returns>An observable that signals the completion of this action.</returns>
+        /// <inheritdoc/>
         public IObservable<Unit> PopPage(bool animate) =>
             _navigationPages
                 .Peek()
@@ -173,12 +158,7 @@ namespace GameCtor.RxNavigation.XamForms
                 // XF completes the pop operation on a background thread :/
                 .ObserveOn(_mainScheduler);
 
-        /// <summary>
-        /// Inserts a page into the current page stack at the given index.
-        /// </summary>
-        /// <param name="index">An insertion index.</param>
-        /// <param name="pageViewModel">A page view model.</param>
-        /// <param name="contract">A page contract.</param>
+        /// <inheritdoc/>
         public void InsertPage(int index, IPageViewModel pageViewModel, string contract = null)
         {
             var page = LocatePageFor(pageViewModel, contract);
@@ -187,23 +167,14 @@ namespace GameCtor.RxNavigation.XamForms
             currentNavigationPage.Navigation.InsertPageBefore(page, currentNavigationPage.Navigation.NavigationStack[index]);
         }
 
-        /// <summary>
-        /// Removes a page from the current page stack at the given index.
-        /// </summary>
-        /// <param name="index">The index of the page to remove.</param>
+        /// <inheritdoc/>
         public void RemovePage(int index)
         {
             var page = _navigationPages.Peek().Navigation.NavigationStack[index];
             _navigationPages.Peek().Navigation.RemovePage(page);
         }
 
-        /// <summary>
-        /// Pushes a page onto the modal stack.
-        /// </summary>
-        /// <param name="modalViewModel">A page view model.</param>
-        /// <param name="contract">A page contract.</param>
-        /// <param name="withNavStack">A flag signalling if a new page stack should be created.</param>
-        /// <returns>An observable that signals the completion of this action.</returns>
+        /// <inheritdoc/>
         public IObservable<Unit> PushModal(IPageViewModel modalViewModel, string contract, bool withNavStack)
         {
             return Observable
@@ -228,10 +199,7 @@ namespace GameCtor.RxNavigation.XamForms
                             .ToObservable());
         }
 
-        /// <summary>
-        /// Pops a page from the top of the modal stack.
-        /// </summary>
-        /// <returns>An observable that signals the completion of this action.</returns>
+        /// <inheritdoc/>
         public IObservable<Unit> PopModal() =>
             Navigation
                 .PopModalAsync()

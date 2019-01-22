@@ -9,12 +9,12 @@ namespace GameCtor.RxNavigation
     public interface IViewShell
     {
         /// <summary>
-        /// An observable that signals when a page is popped from the current page stack.
+        /// Gets an observable that signals when a page is popped from the current page stack.
         /// </summary>
         IObservable<IPageViewModel> PagePopped { get; }
 
         /// <summary>
-        /// An observable that signals when a page is popped from the modal stack.
+        /// Gets an observable that signals when a page is popped from the modal stack.
         /// </summary>
         IObservable<Unit> ModalPopped { get; }
 
@@ -35,7 +35,7 @@ namespace GameCtor.RxNavigation
         /// <summary>
         /// Pops a page from the top of the current page stack.
         /// </summary>
-        /// <param name="animate"></param>
+        /// <param name="animate">Whether the pop should be animated or not.</param>
         /// <returns>An observable that signals the completion of this action.</returns>
         IObservable<Unit> PopPage(
             bool animate);

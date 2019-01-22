@@ -10,12 +10,21 @@ using ReactiveUI;
 
 namespace GameCtor.RxNavigation
 {
+    /// <summary>
+    /// A class that manages a stack of views.
+    /// </summary>
     public class ViewShell : FragmentActivity, IViewShell
     {
         private readonly IScheduler _backgroundScheduler;
         private readonly IScheduler _mainScheduler;
         private readonly IViewLocator _viewLocator;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ViewShell"/> class.
+        /// </summary>
+        /// <param name="backgroundScheduler">A background scheduler.</param>
+        /// <param name="mainScheduler">A main scheduler.</param>
+        /// <param name="viewLocator">A view locator.</param>
         public ViewShell(IScheduler backgroundScheduler, IScheduler mainScheduler, IViewLocator viewLocator)
         {
             _backgroundScheduler = backgroundScheduler ?? RxApp.TaskpoolScheduler;
@@ -26,20 +35,25 @@ namespace GameCtor.RxNavigation
             //this.navigationPages.Push(this);
         }
 
+        /// <inheritdoc/>
         public IObservable<IPageViewModel> PagePopped => throw new NotImplementedException();
 
+        /// <inheritdoc/>
         public IObservable<Unit> ModalPopped => throw new NotImplementedException();
 
+        /// <inheritdoc/>
         public void InsertPage(int index, IPageViewModel page, string contract)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public IObservable<Unit> PopModal()
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public IObservable<Unit> PopPage(bool animate)
         {
             return Observable
@@ -57,11 +71,13 @@ namespace GameCtor.RxNavigation
                 .Switch();
         }
 
+        /// <inheritdoc/>
         public IObservable<Unit> PushModal(IPageViewModel modalViewModel, string contract, bool withNavStack)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public IObservable<Unit> PushPage(IPageViewModel pageViewModel, string contract, bool resetStack, bool animate)
         {
             return Observable
@@ -86,6 +102,7 @@ namespace GameCtor.RxNavigation
                     });
         }
 
+        /// <inheritdoc/>
         public void RemovePage(int index)
         {
             throw new NotImplementedException();
@@ -111,7 +128,6 @@ namespace GameCtor.RxNavigation
             return page;
         }
     }
-
 
     public class MyFragment : Fragment, Animation.IAnimationListener
     {
@@ -147,7 +163,7 @@ namespace GameCtor.RxNavigation
         public override Animation OnCreateAnimation(int transit, bool enter, int nextAnim)
         {
             Animation anim = base.OnCreateAnimation(transit, enter, nextAnim);
-            //Animation anim = AnimationUtils.LoadAnimation(Activity, nextAnim);
+            // Animation anim = AnimationUtils.LoadAnimation(Activity, nextAnim);
 
             if (anim == null && nextAnim != 0)
             {

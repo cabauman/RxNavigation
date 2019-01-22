@@ -5,26 +5,35 @@ using UIKit;
 
 namespace GameCtor.RxNavigation
 {
+    /// <summary>
+     /// A class that manages a stack of views.
+     /// </summary>
     public class RxNavigationController : UINavigationController
     {
         private readonly Subject<UIViewController> _controllerPopped = new Subject<UIViewController>();
 
-        public static int incrementer = 0;
-        public int index;
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RxNavigationController"/> class.
+        /// </summary>
         public RxNavigationController()
         {
-            index = incrementer++;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RxNavigationController"/> class.
+        /// </summary>
+        /// <param name="rootViewController">The first view controller on the stack.</param>
         public RxNavigationController(UIViewController rootViewController)
             : base(rootViewController)
         {
-            index = incrementer++;
         }
 
+        /// <summary>
+        /// Gets an observable that signals when a page is popped.
+        /// </summary>
         public IObservable<UIViewController> ControllerPopped => _controllerPopped.AsObservable();
 
+        /// <inheritdoc/>
         public override UIViewController PopViewController(bool animated)
         {
             var poppedController = base.PopViewController(animated);

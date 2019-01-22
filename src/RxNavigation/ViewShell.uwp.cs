@@ -11,6 +11,9 @@ using Windows.UI.Xaml.Navigation;
 
 namespace GameCtor.RxNavigation
 {
+    /// <summary>
+    /// A class that manages a stack of views.
+    /// </summary>
     public class ViewShell : TransitioningContentControl, IViewShell, IActivatable, IEnableLogger
     {
         private readonly Frame _frame;
@@ -19,6 +22,13 @@ namespace GameCtor.RxNavigation
         private readonly ViewTypeLocator _viewTypeLocator;
         private readonly Subject<IPageViewModel> _pagePopped;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ViewShell"/> class.
+        /// </summary>
+        /// <param name="frame">A frame.</param>
+        /// <param name="backgroundScheduler">A background scheduler.</param>
+        /// <param name="mainScheduler">A main scheduler.</param>
+        /// <param name="viewTypeLocator">A view locator.</param>
         public ViewShell(Frame frame, IScheduler backgroundScheduler, IScheduler mainScheduler, ViewTypeLocator viewTypeLocator)
         {
             _frame = frame;
@@ -40,20 +50,25 @@ namespace GameCtor.RxNavigation
                         });
         }
 
+        /// <inheritdoc/>
         public IObservable<IPageViewModel> PagePopped => _pagePopped.AsObservable();
 
+        /// <inheritdoc/>
         public IObservable<Unit> ModalPopped => throw new NotImplementedException();
 
+        /// <inheritdoc/>
         public void InsertPage(int index, IPageViewModel page, string contract)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public IObservable<Unit> PopModal()
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public IObservable<Unit> PopPage(bool animate)
         {
             return Observable
@@ -61,11 +76,13 @@ namespace GameCtor.RxNavigation
                 .Do(_ => _pagePopped.OnNext(null));
         }
 
+        /// <inheritdoc/>
         public IObservable<Unit> PushModal(IPageViewModel modalViewModel, string contract, bool withNavStack)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public IObservable<Unit> PushPage(IPageViewModel pageViewModel, string contract, bool resetStack, bool animate)
         {
             return Observable
@@ -73,6 +90,7 @@ namespace GameCtor.RxNavigation
                 .Select(_ => Unit.Default);
         }
 
+        /// <inheritdoc/>
         public void RemovePage(int index)
         {
             throw new NotImplementedException();

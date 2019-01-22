@@ -23,7 +23,7 @@ namespace GameCtor.RxNavigation
         private BehaviorSubject<IImmutableList<IPageViewModel>> _currentPageStack;
 
         /// <summary>
-        /// Creates an instance of ViewStackService.
+        /// Initializes a new instance of the <see cref="ViewStackService"/> class.
         /// </summary>
         /// <param name="viewShell">The view shell (platform specific).</param>
         /// <param name="pages">A list of pages to initialize the page stack with.</param>

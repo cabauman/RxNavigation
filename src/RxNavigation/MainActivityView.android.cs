@@ -12,6 +12,9 @@ using ReactiveUI;
 
 namespace GameCtor.RxNavigation
 {
+    /// <summary>
+    /// A class that manages a stack of views.
+    /// </summary>
     public class MainActivityView : IViewShell
     {
         private readonly IScheduler _backgroundScheduler;
@@ -21,6 +24,12 @@ namespace GameCtor.RxNavigation
         private IObservable<Activity> _whenPageCreated;
         private readonly HashSet<Activity> _userInstigatedPops;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MainActivityView"/> class.
+        /// </summary>
+        /// <param name="backgroundScheduler">A background scheduler.</param>
+        /// <param name="mainScheduler">A main scheduler.</param>
+        /// <param name="viewLocator">A view locator.</param>
         public MainActivityView(IScheduler backgroundScheduler, IScheduler mainScheduler, IViewLocator viewLocator)
         {
             _backgroundScheduler = backgroundScheduler ?? RxApp.TaskpoolScheduler;
@@ -52,20 +61,25 @@ namespace GameCtor.RxNavigation
                 .Select(x => x.ViewModel as IPageViewModel);
         }
 
+        /// <inheritdoc/>
         public IObservable<IPageViewModel> PagePopped => PagePopped;
 
+        /// <inheritdoc/>
         public IObservable<Unit> ModalPopped => throw new NotImplementedException();
 
+        /// <inheritdoc/>
         public void InsertPage(int index, IPageViewModel page, string contract)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public IObservable<Unit> PopModal()
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public IObservable<Unit> PopPage(bool animate)
         {
             return Observable
@@ -77,12 +91,14 @@ namespace GameCtor.RxNavigation
                     });
         }
 
+        /// <inheritdoc/>
         public IObservable<Unit> PushModal(IPageViewModel modalViewModel, string contract, bool withNavStack)
         {
             throw new NotImplementedException();
         }
 
         private static int identifier = 0;
+        /// <inheritdoc/>
         public IObservable<Unit> PushPage(IPageViewModel pageViewModel, string contract, bool resetStack, bool animate)
         {
             int id = ++identifier;
@@ -106,6 +122,7 @@ namespace GameCtor.RxNavigation
                     });
         }
 
+        /// <inheritdoc/>
         public void RemovePage(int index)
         {
             throw new NotImplementedException();
