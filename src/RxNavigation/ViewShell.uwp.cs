@@ -36,6 +36,8 @@ namespace GameCtor.RxNavigation
             _mainScheduler = mainScheduler ?? RxApp.MainThreadScheduler;
             _viewTypeLocator = viewTypeLocator ?? new ViewTypeLocator();
 
+            _pagePopped = new Subject<IPageViewModel>();
+
             HorizontalContentAlignment = HorizontalAlignment.Stretch;
             VerticalContentAlignment = VerticalAlignment.Stretch;
 

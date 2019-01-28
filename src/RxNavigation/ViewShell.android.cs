@@ -30,9 +30,6 @@ namespace GameCtor.RxNavigation
             _backgroundScheduler = backgroundScheduler ?? RxApp.TaskpoolScheduler;
             _mainScheduler = mainScheduler ?? RxApp.MainThreadScheduler;
             _viewLocator = viewLocator ?? ViewLocator.Current;
-
-            //this.navigationPages = new Stack<UINavigationController>();
-            //this.navigationPages.Push(this);
         }
 
         /// <inheritdoc/>
@@ -126,58 +123,6 @@ namespace GameCtor.RxNavigation
             viewFor.ViewModel = viewModel;
 
             return page;
-        }
-    }
-
-    public class MyFragment : Fragment, Animation.IAnimationListener
-    {
-        private Subject<Unit> _whenPushed;
-        private Subject<Unit> _whenPopped;
-        private IObservable<Unit> _WhenComplete;
-
-        public MyFragment()
-        {
-        }
-        
-        public IObservable<Unit> WhenPushed
-        {
-            get { return _whenPushed.AsObservable(); }
-        }
-
-        public void OnAnimationEnd(Animation animation)
-        {
-            _whenPushed.OnNext(Unit.Default);
-            _whenPushed.OnCompleted();
-        }
-
-        public void OnAnimationRepeat(Animation animation)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void OnAnimationStart(Animation animation)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Animation OnCreateAnimation(int transit, bool enter, int nextAnim)
-        {
-            Animation anim = base.OnCreateAnimation(transit, enter, nextAnim);
-            // Animation anim = AnimationUtils.LoadAnimation(Activity, nextAnim);
-
-            if (anim == null && nextAnim != 0)
-            {
-                anim = AnimationUtils.LoadAnimation(Activity, nextAnim);
-            }
-
-            _WhenComplete = Observable.FromEventPattern<Animation.AnimationEndEventArgs>(
-                h => anim.AnimationEnd += h,
-                h => anim.AnimationEnd -= h)
-                    .Select(_ => Unit.Default)
-                    .Take(1);
-
-            anim.SetAnimationListener(this);
-            return anim;
         }
     }
 }

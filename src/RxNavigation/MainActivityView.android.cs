@@ -17,11 +17,13 @@ namespace GameCtor.RxNavigation
     /// </summary>
     public class MainActivityView : IViewShell
     {
+        private static int identifier = 0;
+
         private readonly IScheduler _backgroundScheduler;
         private readonly IScheduler _mainScheduler;
         private readonly IViewLocator _viewLocator;
         private readonly IObservable<IPageViewModel> _pagePopped;
-        private IObservable<Activity> _whenPageCreated;
+        private readonly IObservable<Activity> _whenPageCreated;
         private readonly HashSet<Activity> _userInstigatedPops;
 
         /// <summary>
@@ -35,6 +37,8 @@ namespace GameCtor.RxNavigation
             _backgroundScheduler = backgroundScheduler ?? RxApp.TaskpoolScheduler;
             _mainScheduler = mainScheduler ?? RxApp.MainThreadScheduler;
             _viewLocator = viewLocator ?? ViewLocator.Current;
+
+            _userInstigatedPops = new HashSet<Activity>();
 
             _whenPageCreated = Observable
                 .FromEventPattern<ActivityEventArgs>(
@@ -97,7 +101,6 @@ namespace GameCtor.RxNavigation
             throw new NotImplementedException();
         }
 
-        private static int identifier = 0;
         /// <inheritdoc/>
         public IObservable<Unit> PushPage(IPageViewModel pageViewModel, string contract, bool resetStack, bool animate)
         {
