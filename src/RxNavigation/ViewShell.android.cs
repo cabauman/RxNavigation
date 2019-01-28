@@ -10,36 +10,47 @@ using ReactiveUI;
 
 namespace GameCtor.RxNavigation
 {
+    /// <summary>
+    /// A class that manages a stack of views.
+    /// </summary>
     public class ViewShell : FragmentActivity, IViewShell
     {
-        private readonly IScheduler backgroundScheduler;
-        private readonly IScheduler mainScheduler;
-        private readonly IViewLocator viewLocator;
+        private readonly IScheduler _backgroundScheduler;
+        private readonly IScheduler _mainScheduler;
+        private readonly IViewLocator _viewLocator;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ViewShell"/> class.
+        /// </summary>
+        /// <param name="backgroundScheduler">A background scheduler.</param>
+        /// <param name="mainScheduler">A main scheduler.</param>
+        /// <param name="viewLocator">A view locator.</param>
         public ViewShell(IScheduler backgroundScheduler, IScheduler mainScheduler, IViewLocator viewLocator)
         {
-            this.backgroundScheduler = backgroundScheduler ?? RxApp.TaskpoolScheduler;
-            this.mainScheduler = mainScheduler ?? RxApp.MainThreadScheduler;
-            this.viewLocator = viewLocator ?? ViewLocator.Current;
-
-            //this.navigationPages = new Stack<UINavigationController>();
-            //this.navigationPages.Push(this);
+            _backgroundScheduler = backgroundScheduler ?? RxApp.TaskpoolScheduler;
+            _mainScheduler = mainScheduler ?? RxApp.MainThreadScheduler;
+            _viewLocator = viewLocator ?? ViewLocator.Current;
         }
 
+        /// <inheritdoc/>
         public IObservable<IPageViewModel> PagePopped => throw new NotImplementedException();
 
+        /// <inheritdoc/>
         public IObservable<Unit> ModalPopped => throw new NotImplementedException();
 
+        /// <inheritdoc/>
         public void InsertPage(int index, IPageViewModel page, string contract)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public IObservable<Unit> PopModal()
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public IObservable<Unit> PopPage(bool animate)
         {
             return Observable
@@ -57,85 +68,61 @@ namespace GameCtor.RxNavigation
                 .Switch();
         }
 
+        /// <inheritdoc/>
         public IObservable<Unit> PushModal(IPageViewModel modalViewModel, string contract, bool withNavStack)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public IObservable<Unit> PushPage(IPageViewModel pageViewModel, string contract, bool resetStack, bool animate)
         {
             return Observable
                 .Start(
                     () =>
                     {
-                        MyFragment frag = new MyFragment();
+                        var page = LocatePageFor(pageViewModel, contract);
+                        return page;
+                    },
+                    _backgroundScheduler)
+                .ObserveOn(_mainScheduler)
+                .SelectMany(
+                    page =>
+                    {
                         SupportFragmentManager
                             .BeginTransaction()
-                            .Add(Android.Resource.Id.Content, frag)
+                            .Add(Android.Resource.Id.Content, page)
                             .AddToBackStack("name")
                             .Commit();
 
-                        return frag.WhenPushed;
-                    })
-                .Switch();
+                        return page.WhenPushed;
+                    });
         }
 
+        /// <inheritdoc/>
         public void RemovePage(int index)
         {
             throw new NotImplementedException();
         }
-    }
 
-
-    public class MyFragment : Fragment, Animation.IAnimationListener
-    {
-        private Subject<Unit> whenPushed;
-        private Subject<Unit> whenPopped;
-        private IObservable<Unit> WhenComplete;
-
-        public MyFragment()
+        private MyFragment LocatePageFor(object viewModel, string contract)
         {
-        }
-        
-        public IObservable<Unit> WhenPushed
-        {
-            get { return whenPushed.AsObservable(); }
-        }
+            var viewFor = _viewLocator.ResolveView(viewModel, contract);
+            var page = viewFor as MyFragment;
 
-        public void OnAnimationEnd(Animation animation)
-        {
-            whenPushed.OnNext(Unit.Default);
-            whenPushed.OnCompleted();
-        }
-
-        public void OnAnimationRepeat(Animation animation)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void OnAnimationStart(Animation animation)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Animation OnCreateAnimation(int transit, bool enter, int nextAnim)
-        {
-            Animation anim = base.OnCreateAnimation(transit, enter, nextAnim);
-            //Animation anim = AnimationUtils.LoadAnimation(Activity, nextAnim);
-
-            if(anim == null && nextAnim != 0)
+            if (viewFor == null)
             {
-                anim = AnimationUtils.LoadAnimation(Activity, nextAnim);
+                throw new InvalidOperationException($"No view could be located for type '{viewModel.GetType().FullName}', contract '{contract}'. Be sure Splat has an appropriate registration.");
             }
 
-            WhenComplete = Observable.FromEventPattern<Animation.AnimationEndEventArgs>(
-                h => anim.AnimationEnd += h,
-                h => anim.AnimationEnd -= h)
-                    .Select(_ => Unit.Default)
-                    .Take(1);
+            if (page == null)
+            {
+                throw new InvalidOperationException($"Resolved view '{viewFor.GetType().FullName}' for type '{viewModel.GetType().FullName}', contract '{contract}' is not a Page.");
+            }
 
-            anim.SetAnimationListener(this);
-            return anim;
+            viewFor.ViewModel = viewModel;
+
+            return page;
         }
     }
 }

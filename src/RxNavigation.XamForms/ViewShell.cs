@@ -1,10 +1,10 @@
-﻿using ReactiveUI;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
+using ReactiveUI;
 using Xamarin.Forms;
 
 namespace GameCtor.RxNavigation.XamForms
@@ -14,17 +14,17 @@ namespace GameCtor.RxNavigation.XamForms
     /// </summary>
     public sealed class ViewShell : Xamarin.Forms.NavigationPage, IViewShell
     {
-        private readonly IScheduler backgroundScheduler;
-        private readonly IScheduler mainScheduler;
-        private readonly IViewLocator viewLocator;
-        private readonly IObservable<IPageViewModel> pagePopped;
-        private readonly IObservable<Unit> modalPopped;
-        private readonly IObservable<Page> modalPushed;
+        private readonly IScheduler _backgroundScheduler;
+        private readonly IScheduler _mainScheduler;
+        private readonly IViewLocator _viewLocator;
+        private readonly IObservable<IPageViewModel> _pagePopped;
+        private readonly IObservable<Unit> _modalPopped;
+        private readonly IObservable<Page> _modalPushed;
 
-        private Stack<NavigationPage> navigationPages;
+        private Stack<NavigationPage> _navigationPages;
 
         /// <summary>
-        /// Creates an instance of ViewShell.
+        /// Initializes a new instance of the <see cref="ViewShell"/> class.
         /// </summary>
         public ViewShell()
             : this(RxApp.TaskpoolScheduler, RxApp.MainThreadScheduler, ViewLocator.Current)
@@ -32,30 +32,30 @@ namespace GameCtor.RxNavigation.XamForms
         }
 
         /// <summary>
-        /// Creates an instance of ViewShell.
+        /// Initializes a new instance of the <see cref="ViewShell"/> class.
         /// </summary>
         /// <param name="backgroundScheduler">A background scheduler.</param>
         /// <param name="mainScheduler">A main scheduler.</param>
         /// <param name="viewLocator">A view locator.</param>
         public ViewShell(IScheduler backgroundScheduler, IScheduler mainScheduler, IViewLocator viewLocator)
         {
-            this.backgroundScheduler = backgroundScheduler ?? RxApp.TaskpoolScheduler;
-            this.mainScheduler = mainScheduler ?? RxApp.MainThreadScheduler;
-            this.viewLocator = viewLocator ?? ViewLocator.Current;
+            _backgroundScheduler = backgroundScheduler ?? RxApp.TaskpoolScheduler;
+            _mainScheduler = mainScheduler ?? RxApp.MainThreadScheduler;
+            _viewLocator = viewLocator ?? ViewLocator.Current;
 
-            this.navigationPages = new Stack<NavigationPage>();
+            _navigationPages = new Stack<NavigationPage>();
 
-            this.modalPushed = Observable
+            _modalPushed = Observable
                 .FromEventPattern<ModalPushedEventArgs>(
                     x => Application.Current.ModalPushed += x,
                     x => Application.Current.ModalPushed -= x)
                 .Select(x => x.EventArgs.Modal);
 
-            this.pagePopped = modalPushed
+            _pagePopped = _modalPushed
                 .StartWith(this)
                 .Select(page => page as NavigationPage)
                 .Where(x => x != null)
-                .Do(x => navigationPages.Push(x))
+                .Do(x => _navigationPages.Push(x))
                 .SelectMany(
                     navigationPage =>
                     {
@@ -65,52 +65,41 @@ namespace GameCtor.RxNavigation.XamForms
                             .Where(x => x != null);
                     });
 
-            this.modalPopped = Observable
+            _modalPopped = Observable
                 .FromEventPattern<ModalPoppedEventArgs>(
                     x => Application.Current.ModalPopped += x,
                     x => Application.Current.ModalPopped -= x)
                 .Do(
                     x =>
                     {
-                        if(x.EventArgs.Modal is NavigationPage)
+                        if (x.EventArgs.Modal is NavigationPage)
                         {
-                            navigationPages.Pop();
+                            _navigationPages.Pop();
                         }
                     })
                 .Select(x => Unit.Default);
         }
 
-        /// <summary>
-        /// An observable that signals when a page is popped from the current page stack.
-        /// </summary>
-        public IObservable<IPageViewModel> PagePopped => this.pagePopped;
+        /// <inheritdoc/>
+        public IObservable<IPageViewModel> PagePopped => _pagePopped;
 
-        /// <summary>
-        /// An observable that signals when a page is popped from the modal stack.
-        /// </summary>
-        public IObservable<Unit> ModalPopped => this.modalPopped;
+        /// <inheritdoc/>
+        public IObservable<Unit> ModalPopped => _modalPopped;
 
-        /// <summary>
-        /// Pushes a page onto the current page stack.
-        /// </summary>
-        /// <param name="pageViewModel">A page view model.</param>
-        /// <param name="contract">A page contract.</param>
-        /// <param name="resetStack">A flag signalling if the page stack should be reset.</param>
-        /// <param name="animate">A flag signalling if the push should be animated.</param>
-        /// <returns>An observable that signals the completion of this action.</returns>
+        /// <inheritdoc/>
         public IObservable<Unit> PushPage(IPageViewModel pageViewModel, string contract, bool resetStack, bool animate)
         {
             // If we don't have a root page yet, be sure we create one and assign one immediately because otherwise we'll get an exception.
             // Otherwise, create it off the main thread to improve responsiveness and perceived performance.
-            var hasRoot = this.Navigation.NavigationStack.Count > 0;
-            var mainScheduler = hasRoot ? this.mainScheduler : CurrentThreadScheduler.Instance;
-            var backgroundScheduler = hasRoot ? this.backgroundScheduler : CurrentThreadScheduler.Instance;
+            var hasRoot = Navigation.NavigationStack.Count > 0;
+            var mainScheduler = hasRoot ? _mainScheduler : CurrentThreadScheduler.Instance;
+            var backgroundScheduler = hasRoot ? _backgroundScheduler : CurrentThreadScheduler.Instance;
 
             return Observable
                 .Start(
                     () =>
                     {
-                        var page = this.LocatePageFor(pageViewModel, contract);
+                        var page = LocatePageFor(pageViewModel, contract);
                         page.Title = pageViewModel.Title;
                         return page;
                     },
@@ -119,12 +108,11 @@ namespace GameCtor.RxNavigation.XamForms
                 .SelectMany(
                     page =>
                     {
-                        if(resetStack)
+                        if (resetStack)
                         {
-                            if(this.Navigation.NavigationStack.Count == 0)
+                            if (Navigation.NavigationStack.Count == 0)
                             {
-                                return this
-                                    .navigationPages
+                                return _navigationPages
                                     .Peek()
                                     .Navigation
                                     .PushAsync(page, animated: false)
@@ -133,7 +121,7 @@ namespace GameCtor.RxNavigation.XamForms
                             else
                             {
                                 // XF does not allow us to pop to a new root page. Instead, we need to inject the new root page and then pop to it.
-                                var currentNav = navigationPages.Peek().Navigation;
+                                var currentNav = _navigationPages.Peek().Navigation;
                                 return currentNav
                                     .PushAsync(page, animate)
                                     .ToObservable()
@@ -150,8 +138,7 @@ namespace GameCtor.RxNavigation.XamForms
                         }
                         else
                         {
-                            return this
-                                .navigationPages
+                            return _navigationPages
                                 .Peek()
                                 .Navigation
                                 .PushAsync(page, animate)
@@ -160,60 +147,41 @@ namespace GameCtor.RxNavigation.XamForms
                     });
         }
 
-        /// <summary>
-        /// Pops a page from the top of the current page stack.
-        /// </summary>
-        /// <param name="animate"></param>
-        /// <returns>An observable that signals the completion of this action.</returns>
+        /// <inheritdoc/>
         public IObservable<Unit> PopPage(bool animate) =>
-            this
-                .navigationPages
+            _navigationPages
                 .Peek()
                 .Navigation
                 .PopAsync(animate)
                 .ToObservable()
                 .Select(_ => Unit.Default)
                 // XF completes the pop operation on a background thread :/
-                .ObserveOn(this.mainScheduler);
+                .ObserveOn(_mainScheduler);
 
-        /// <summary>
-        /// Inserts a page into the current page stack at the given index.
-        /// </summary>
-        /// <param name="index">An insertion index.</param>
-        /// <param name="pageViewModel">A page view model.</param>
-        /// <param name="contract">A page contract.</param>
+        /// <inheritdoc/>
         public void InsertPage(int index, IPageViewModel pageViewModel, string contract = null)
         {
-            var page = this.LocatePageFor(pageViewModel, contract);
+            var page = LocatePageFor(pageViewModel, contract);
             page.Title = pageViewModel.Title;
-            var currentNavigationPage = this.navigationPages.Peek();
+            var currentNavigationPage = _navigationPages.Peek();
             currentNavigationPage.Navigation.InsertPageBefore(page, currentNavigationPage.Navigation.NavigationStack[index]);
         }
 
-        /// <summary>
-        /// Removes a page from the current page stack at the given index.
-        /// </summary>
-        /// <param name="index">The index of the page to remove.</param>
+        /// <inheritdoc/>
         public void RemovePage(int index)
         {
-            var page = this.navigationPages.Peek().Navigation.NavigationStack[index];
-            this.navigationPages.Peek().Navigation.RemovePage(page);
+            var page = _navigationPages.Peek().Navigation.NavigationStack[index];
+            _navigationPages.Peek().Navigation.RemovePage(page);
         }
 
-        /// <summary>
-        /// Pushes a page onto the modal stack.
-        /// </summary>
-        /// <param name="modalViewModel">A page view model.</param>
-        /// <param name="contract">A page contract.</param>
-        /// <param name="withNavStack">A flag signalling if a new page stack should be created.</param>
-        /// <returns>An observable that signals the completion of this action.</returns>
+        /// <inheritdoc/>
         public IObservable<Unit> PushModal(IPageViewModel modalViewModel, string contract, bool withNavStack)
         {
             return Observable
                 .Start(
                     () =>
                     {
-                        var page = this.LocatePageFor(modalViewModel, contract);
+                        var page = LocatePageFor(modalViewModel, contract);
                         page.Title = modalViewModel.Title;
                         if (withNavStack)
                         {
@@ -222,40 +190,35 @@ namespace GameCtor.RxNavigation.XamForms
 
                         return page;
                     },
-                    this.backgroundScheduler)
-                .ObserveOn(this.mainScheduler)
+                    _backgroundScheduler)
+                .ObserveOn(_mainScheduler)
                 .SelectMany(
                     page =>
-                        this
-                            .Navigation
+                        Navigation
                             .PushModalAsync(page)
                             .ToObservable());
         }
 
-        /// <summary>
-        /// Pops a page from the top of the modal stack.
-        /// </summary>
-        /// <returns>An observable that signals the completion of this action.</returns>
+        /// <inheritdoc/>
         public IObservable<Unit> PopModal() =>
-            this
-                .Navigation
+            Navigation
                 .PopModalAsync()
                 .ToObservable()
                 .Select(_ => Unit.Default)
                 // XF completes the pop operation on a background thread :/
-                .ObserveOn(this.mainScheduler);
+                .ObserveOn(_mainScheduler);
 
         private Page LocatePageFor(object viewModel, string contract)
         {
-            var viewFor = viewLocator.ResolveView(viewModel, contract);
+            var viewFor = _viewLocator.ResolveView(viewModel, contract);
             var page = viewFor as Page;
 
-            if(viewFor == null)
+            if (viewFor == null)
             {
                 throw new InvalidOperationException($"No view could be located for type '{viewModel.GetType().FullName}', contract '{contract}'. Be sure Splat has an appropriate registration.");
             }
 
-            if(page == null)
+            if (page == null)
             {
                 throw new InvalidOperationException($"Resolved view '{viewFor.GetType().FullName}' for type '{viewModel.GetType().FullName}', contract '{contract}' is not a Page.");
             }

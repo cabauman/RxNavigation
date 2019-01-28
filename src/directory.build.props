@@ -29,13 +29,23 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ReactiveUI" Version="9.8.1" />
+    <PackageReference Include="ReactiveUI" Version="9.8.15" />
     <PackageReference Include="System.Reactive" Version="4.1.2" />
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)stylecop.json" />
   </ItemGroup>
 
   <ItemGroup Condition="!'$(IsTestProject)' and !'$(IsBenchmarkProject)'">
     <PackageReference Include="Nerdbank.GitVersioning" Version="2.3.38" PrivateAssets="all" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" PrivateAssets="all" />
   </ItemGroup>
+
+  <PropertyGroup Condition="!'$(IsTestProject)' and !'$(IsBenchmarkProject)'">
+    <CodeAnalysisRuleset>$(MSBuildThisFileDirectory)analyzers.ruleset</CodeAnalysisRuleset>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(IsTestProject)' or '$(IsBenchmarkProject)'">
+    <CodeAnalysisRuleset>$(MSBuildThisFileDirectory)analyzers.tests.ruleset</CodeAnalysisRuleset>
+  </PropertyGroup>
 
   <PropertyGroup>
     <SolutionDir Condition="'$(SolutionDir)' == ''">$(MSBuildThisFileDirectory)</SolutionDir>

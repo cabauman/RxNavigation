@@ -11,20 +11,32 @@ using Windows.UI.Xaml.Navigation;
 
 namespace GameCtor.RxNavigation
 {
+    /// <summary>
+    /// A class that manages a stack of views.
+    /// </summary>
     public class ViewShell : TransitioningContentControl, IViewShell, IActivatable, IEnableLogger
     {
-        private readonly Frame frame;
-        private readonly IScheduler backgroundScheduler;
-        private readonly IScheduler mainScheduler;
-        private readonly ViewTypeLocator viewTypeLocator;
-        private readonly Subject<IPageViewModel> pagePopped;
+        private readonly Frame _frame;
+        private readonly IScheduler _backgroundScheduler;
+        private readonly IScheduler _mainScheduler;
+        private readonly ViewTypeLocator _viewTypeLocator;
+        private readonly Subject<IPageViewModel> _pagePopped;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ViewShell"/> class.
+        /// </summary>
+        /// <param name="frame">A frame.</param>
+        /// <param name="backgroundScheduler">A background scheduler.</param>
+        /// <param name="mainScheduler">A main scheduler.</param>
+        /// <param name="viewTypeLocator">A view locator.</param>
         public ViewShell(Frame frame, IScheduler backgroundScheduler, IScheduler mainScheduler, ViewTypeLocator viewTypeLocator)
         {
-            this.frame = frame;
-            this.backgroundScheduler = backgroundScheduler ?? RxApp.TaskpoolScheduler;
-            this.mainScheduler = mainScheduler ?? RxApp.MainThreadScheduler;
-            this.viewTypeLocator = viewTypeLocator ?? new ViewTypeLocator();
+            _frame = frame;
+            _backgroundScheduler = backgroundScheduler ?? RxApp.TaskpoolScheduler;
+            _mainScheduler = mainScheduler ?? RxApp.MainThreadScheduler;
+            _viewTypeLocator = viewTypeLocator ?? new ViewTypeLocator();
+
+            _pagePopped = new Subject<IPageViewModel>();
 
             HorizontalContentAlignment = HorizontalAlignment.Stretch;
             VerticalContentAlignment = VerticalAlignment.Stretch;
@@ -40,39 +52,47 @@ namespace GameCtor.RxNavigation
                         });
         }
 
-        public IObservable<IPageViewModel> PagePopped => pagePopped.AsObservable();
+        /// <inheritdoc/>
+        public IObservable<IPageViewModel> PagePopped => _pagePopped.AsObservable();
 
+        /// <inheritdoc/>
         public IObservable<Unit> ModalPopped => throw new NotImplementedException();
 
+        /// <inheritdoc/>
         public void InsertPage(int index, IPageViewModel page, string contract)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public IObservable<Unit> PopModal()
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public IObservable<Unit> PopPage(bool animate)
         {
             return Observable
-                .Start(() => this.frame.GoBack())
-                .Do(_ => pagePopped.OnNext(null));
+                .Start(() => _frame.GoBack())
+                .Do(_ => _pagePopped.OnNext(null));
         }
 
+        /// <inheritdoc/>
         public IObservable<Unit> PushModal(IPageViewModel modalViewModel, string contract, bool withNavStack)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public IObservable<Unit> PushPage(IPageViewModel pageViewModel, string contract, bool resetStack, bool animate)
         {
             return Observable
-                .Start(() => this.frame.Navigate(LocatePageFor(pageViewModel, contract), pageViewModel))
+                .Start(() => _frame.Navigate(LocatePageFor(pageViewModel, contract), pageViewModel))
                 .Select(_ => Unit.Default);
         }
 
+        /// <inheritdoc/>
         public void RemovePage(int index)
         {
             throw new NotImplementedException();
@@ -80,7 +100,7 @@ namespace GameCtor.RxNavigation
 
         private Type LocatePageFor(object viewModel, string contract)
         {
-            var viewType = this.viewTypeLocator.ResolveView(viewModel, contract);
+            var viewType = _viewTypeLocator.ResolveView(viewModel, contract);
 
             if (viewType == null)
             {

@@ -23,7 +23,6 @@
   </ItemGroup>
 
   <ItemGroup Condition=" $(TargetFramework.StartsWith('uap10.0')) ">
-    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.2" />
     <Compile Include="**\*.uwp.cs" />
   </ItemGroup>
 
@@ -36,9 +35,5 @@
 
   <ItemGroup Condition=" $(TargetFramework.StartsWith('Xamarin.iOS')) ">
     <Compile Include="**\*.apple.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Update="ReactiveUI" Version="9.8.15" />
   </ItemGroup>
 </Project>

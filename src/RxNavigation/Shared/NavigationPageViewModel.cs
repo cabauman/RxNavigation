@@ -9,13 +9,13 @@ namespace GameCtor.RxNavigation
     public sealed class NavigationPageViewModel : INavigationPageViewModel
     {
         /// <summary>
-        /// Creates an instance of NavigationPageViewModel.
+        /// Initializes a new instance of the <see cref="NavigationPageViewModel"/> class.
         /// </summary>
         /// <param name="page">The page to push on the page stack.</param>
         public NavigationPageViewModel(IPageViewModel page = null)
         {
             var contents = page != null ? ImmutableList.Create(page) : ImmutableList<IPageViewModel>.Empty;
-            this.PageStack = new BehaviorSubject<IImmutableList<IPageViewModel>>(contents);
+            PageStack = new BehaviorSubject<IImmutableList<IPageViewModel>>(contents);
         }
 
         /// <summary>

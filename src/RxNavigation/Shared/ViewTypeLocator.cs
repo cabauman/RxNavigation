@@ -4,8 +4,15 @@ using Splat;
 
 namespace ReactiveUI
 {
+    /// <summary>
+    /// A class that locates a registered view type corresponding to a given view model.
+    /// </summary>
     public sealed class ViewTypeLocator : IEnableLogger
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ViewTypeLocator"/> class.
+        /// </summary>
+        /// <param name="viewModelToViewFunc">A function that is used to convert a view model name to a proposed view name.</param>
         public ViewTypeLocator(Func<string, string> viewModelToViewFunc = null)
         {
             ViewModelToViewFunc = viewModelToViewFunc ?? (vm => vm.Replace("ViewModel", "View"));
