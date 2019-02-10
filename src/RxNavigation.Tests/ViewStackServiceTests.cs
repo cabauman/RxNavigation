@@ -106,7 +106,7 @@ namespace RxNavigation.Tests
             var sut = new ViewStackService(_viewShell, new[] { _page, _page });
 
             // Assert
-            _viewShell.Received(2).InsertPage(Arg.Any<int>(), _page, string.Empty);
+            _viewShell.Received(2).InsertPage(Arg.Any<int>(), _page, null);
         }
 
         [Fact]
