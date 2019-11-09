@@ -14,7 +14,7 @@ namespace GameCtor.RxNavigation
     /// <summary>
     /// A class that manages a stack of views.
     /// </summary>
-    public class ViewShell : TransitioningContentControl, IViewShell, IActivatable, IEnableLogger
+    public class ViewShell : TransitioningContentControl, IViewShell, IActivatableView, IEnableLogger
     {
         private readonly Frame _frame;
         private readonly IScheduler _backgroundScheduler;

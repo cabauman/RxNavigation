@@ -29,14 +29,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ReactiveUI" Version="9.8.15" />
-    <PackageReference Include="System.Reactive" Version="4.1.2" />
+    <PackageReference Include="ReactiveUI" Version="10.5.7" />
+    <PackageReference Include="System.Reactive" Version="4.2.0" />
     <AdditionalFiles Include="$(MSBuildThisFileDirectory)stylecop.json" />
   </ItemGroup>
 
   <ItemGroup Condition="!'$(IsTestProject)' and !'$(IsBenchmarkProject)'">
-    <PackageReference Include="Nerdbank.GitVersioning" Version="2.3.38" PrivateAssets="all" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" PrivateAssets="all" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.0.26" PrivateAssets="all" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
   </ItemGroup>
 
   <PropertyGroup Condition="!'$(IsTestProject)' and !'$(IsBenchmarkProject)'">
