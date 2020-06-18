@@ -15,13 +15,10 @@ namespace Sample
 
         public AppBootstrapper()
         {
-            Locator.CurrentMutable.InitializeSplat();
-            Locator.CurrentMutable.InitializeReactiveUI();
-
             RegisterServices();
             RegisterViews();
 
-            IViewShell mainView = new ViewShell(RxApp.TaskpoolScheduler, RxApp.MainThreadScheduler, ViewLocator.Current);
+            IViewShell mainView = new ViewShell(RxApp.TaskpoolScheduler, RxApp.MainThreadScheduler, new ReactiveUIViewLocator());
             _navigationPage = mainView as Xamarin.Forms.NavigationPage;
             IViewStackService viewStackService = new ViewStackService(mainView);
             Locator.CurrentMutable.RegisterConstant(viewStackService, typeof(IViewStackService));
