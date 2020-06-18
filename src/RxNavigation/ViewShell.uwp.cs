@@ -3,8 +3,6 @@ using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using ReactiveUI;
-using Splat;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
@@ -14,12 +12,12 @@ namespace GameCtor.RxNavigation
     /// <summary>
     /// A class that manages a stack of views.
     /// </summary>
-    public class ViewShell : TransitioningContentControl, IViewShell, IActivatableView, IEnableLogger
+    public class ViewShell : ContentControl, IViewShell
     {
         private readonly Frame _frame;
         private readonly IScheduler _backgroundScheduler;
         private readonly IScheduler _mainScheduler;
-        private readonly ViewTypeLocator _viewTypeLocator;
+        private readonly IViewLocator _viewLocator;
         private readonly Subject<IPageViewModel> _pagePopped;
 
         /// <summary>
@@ -28,13 +26,13 @@ namespace GameCtor.RxNavigation
         /// <param name="frame">A frame.</param>
         /// <param name="backgroundScheduler">A background scheduler.</param>
         /// <param name="mainScheduler">A main scheduler.</param>
-        /// <param name="viewTypeLocator">A view locator.</param>
-        public ViewShell(Frame frame, IScheduler backgroundScheduler, IScheduler mainScheduler, ViewTypeLocator viewTypeLocator)
+        /// <param name="viewLocator">A view locator.</param>
+        public ViewShell(Frame frame, IScheduler backgroundScheduler, IScheduler mainScheduler, IViewLocator viewLocator)
         {
             _frame = frame;
-            _backgroundScheduler = backgroundScheduler ?? RxApp.TaskpoolScheduler;
-            _mainScheduler = mainScheduler ?? RxApp.MainThreadScheduler;
-            _viewTypeLocator = viewTypeLocator ?? new ViewTypeLocator();
+            _backgroundScheduler = backgroundScheduler;
+            _mainScheduler = mainScheduler;
+            _viewLocator = viewLocator;
 
             _pagePopped = new Subject<IPageViewModel>();
 
@@ -47,7 +45,7 @@ namespace GameCtor.RxNavigation
                     .Do(
                         e =>
                         {
-                            var viewFor = e.EventArgs.Content as IViewFor;
+                            var viewFor = e.EventArgs.Content as IView;
                             viewFor.ViewModel = e.EventArgs.Parameter;
                         });
         }
@@ -100,7 +98,7 @@ namespace GameCtor.RxNavigation
 
         private Type LocatePageFor(object viewModel, string contract)
         {
-            var viewType = _viewTypeLocator.ResolveView(viewModel, contract);
+            var viewType = _viewLocator.ResolveViewType(viewModel, contract);
 
             if (viewType == null)
             {

@@ -6,7 +6,6 @@ using System.Reactive.Subjects;
 using Android.Support.V4.App;
 using Android.Support.V7.App;
 using Android.Views.Animations;
-using ReactiveUI;
 
 namespace GameCtor.RxNavigation
 {
@@ -27,9 +26,9 @@ namespace GameCtor.RxNavigation
         /// <param name="viewLocator">A view locator.</param>
         public ViewShell(IScheduler backgroundScheduler, IScheduler mainScheduler, IViewLocator viewLocator)
         {
-            _backgroundScheduler = backgroundScheduler ?? RxApp.TaskpoolScheduler;
-            _mainScheduler = mainScheduler ?? RxApp.MainThreadScheduler;
-            _viewLocator = viewLocator ?? ViewLocator.Current;
+            _backgroundScheduler = backgroundScheduler;
+            _mainScheduler = mainScheduler;
+            _viewLocator = viewLocator;
         }
 
         /// <inheritdoc/>

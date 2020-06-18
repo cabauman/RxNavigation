@@ -8,7 +8,6 @@ using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using CoreAnimation;
 using Foundation;
-using ReactiveUI;
 using UIKit;
 
 namespace GameCtor.RxNavigation
@@ -36,9 +35,9 @@ namespace GameCtor.RxNavigation
         /// <param name="viewLocator">A view locator.</param>
         public ViewShell(IScheduler backgroundScheduler, IScheduler mainScheduler, IViewLocator viewLocator)
         {
-            _backgroundScheduler = backgroundScheduler ?? RxApp.TaskpoolScheduler;
-            _mainScheduler = mainScheduler ?? RxApp.MainThreadScheduler;
-            _viewLocator = viewLocator ?? ViewLocator.Current;
+            _backgroundScheduler = backgroundScheduler;
+            _mainScheduler = mainScheduler;
+            _viewLocator = viewLocator;
 
             _navigationPagePushed = new Subject<RxNavigationController>();
             _modalStackPlusMainView = new Stack<UIViewController>();
@@ -56,7 +55,7 @@ namespace GameCtor.RxNavigation
                             .Select(
                                 viewController =>
                                 {
-                                    var viewFor = viewController as IViewFor;
+                                    var viewFor = viewController as IView;
                                     return viewFor?.ViewModel as IPageViewModel;
                                 });
                     });

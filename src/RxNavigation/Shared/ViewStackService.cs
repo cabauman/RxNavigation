@@ -5,15 +5,13 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using ReactiveUI;
-using Splat;
 
 namespace GameCtor.RxNavigation
 {
     /// <summary>
     /// Service that manages a stack of views.
     /// </summary>
-    public sealed class ViewStackService : IViewStackService, IEnableLogger
+    public sealed class ViewStackService : IViewStackService
     {
         private readonly IViewShell _viewShell;
         private readonly BehaviorSubject<IImmutableList<IPageViewModel>> _modalPageStack;
@@ -70,7 +68,6 @@ namespace GameCtor.RxNavigation
                     _ =>
                     {
                         var removedPage = PopStackAndTick(_currentPageStack);
-                        this.Log().Debug("Removed page '{0}' from stack.", removedPage.Title);
                     })
                 .Subscribe();
 
@@ -80,7 +77,6 @@ namespace GameCtor.RxNavigation
                     _ =>
                     {
                         var removedPage = PopStackAndTick(_modalPageStack);
-                        this.Log().Debug("Removed modal page '{0}' from stack.", removedPage.Title);
                     })
                 .Subscribe();
         }
@@ -121,7 +117,6 @@ namespace GameCtor.RxNavigation
                     _ =>
                     {
                         AddToStackAndTick(_currentPageStack, page, resetStack);
-                        this.Log().Debug("Added page '{0}' (contract '{1}') to stack.", page.Title, contract);
                         if (resetStack)
                         {
                             var stack = _currentPageStack.Value;
@@ -245,7 +240,6 @@ namespace GameCtor.RxNavigation
                     _ =>
                     {
                         AddToStackAndTick(_modalPageStack, modal, false);
-                        this.Log().Debug("Added modal '{0}' (contract '{1}') to stack.", modal.Title, contract);
                     });
         }
 
@@ -273,7 +267,6 @@ namespace GameCtor.RxNavigation
                     _ =>
                     {
                         AddToStackAndTick(_modalPageStack, modal, false);
-                        this.Log().Debug("Added modal '{0}' (contract '{1}') to stack.", modal.Title, contract);
                     });
         }
 

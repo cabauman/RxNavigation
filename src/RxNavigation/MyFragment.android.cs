@@ -6,7 +6,6 @@ using System.Reactive.Subjects;
 using Android.Support.V4.App;
 using Android.Support.V7.App;
 using Android.Views.Animations;
-using ReactiveUI;
 
 namespace GameCtor.RxNavigation
 {
