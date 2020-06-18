@@ -3,7 +3,7 @@ using GameCtor.RxNavigation;
 
 namespace Sample.Common
 {
-    public class BaseViewModel : ReactiveObject, ISupportsActivation
+    public class BaseViewModel : ReactiveObject, IActivatableViewModel
     {
         private readonly ViewModelActivator _activator = new ViewModelActivator();
 

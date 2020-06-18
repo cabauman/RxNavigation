@@ -13,8 +13,8 @@
     <PackageReference Include="ReactiveUI" Version="10.5.7" />
     <PackageReference Include="ReactiveUI.XamForms" Version="10.5.7" />
     <PackageReference Include="System.Collections.Immutable" Version="1.6.0" />
-    <PackageReference Include="System.Reactive" Version="4.2.0" />
-    <PackageReference Include="Xamarin.Forms" Version="4.3.0.947036" />
+    <PackageReference Include="System.Reactive" Version="4.4.1" />
+    <PackageReference Include="Xamarin.Forms" Version="4.6.0.967" />
   </ItemGroup>
 
   <ItemGroup>
